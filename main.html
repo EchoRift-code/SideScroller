@@ -1,0 +1,30 @@
+<!-- Ctrl + Shift + I in browser to pull up console to see bugs -->
+<!-- This file defines the canvases name and dimensions
+ It then calls main.js file to get the javascript code-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Side Scroller</title>
+        <style>
+            html, body{
+                background-color: greenyellow; /*Alternate is #222*/
+                margin: 0; /*Remove default spacing*/
+                padding: 0;
+                overflow: hidden; /* Hides the scrollbar */
+                display: flex;
+                justify-content: center; /*Center canvas horizontally*/
+                align-items: center; /*Center canvas vertically*/
+                height: 100vh; /*full viewport height*/
+            }
+            canvas{
+                display: block; /*Remove inline spacing around canvas*/
+                border: 2px solid black; /*Optional border*/
+            }
+            </style>
+    </head>
+    <body>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <script type="module" src="main.js"></script>
+    </body>
+</html>
