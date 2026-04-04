@@ -386,7 +386,7 @@ function gameLoop(){
         }
 
         // The ogre inside the 50x50 tile is 13-37 wide
-        if(player.x < enemyX + 37 && player.x + player.width > enemyX+13 && player.y < enemyY + 50 && player.y + player.height > enemyY){           
+        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + 50 && player.y + player.height > ogre.y){           
             died = true;  
             level1Active = false;                          
         }
@@ -396,6 +396,7 @@ function gameLoop(){
         //draw.fillStyle = "black";
         //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
+        console.log("Drawing image");
     }
 
     if(level2){
