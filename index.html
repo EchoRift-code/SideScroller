@@ -5,26 +5,72 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Side Scroller</title>
-        <style>
-            html, body{
+        <title>Side Scroller</title> <!-- Title of the browser page-->
+        <style> /* Styles the entire page.*/
+            html, body{ /* html, body = apply the style to both html and body. Helpful incase a browser has its own default values*/
                 background-color: greenyellow; /*Alternate is #222*/
-                margin: 0; /*Remove default spacing*/
+                margin: 0; /*Remove default browser spacing*/
+
+                color: rgb(33, 36, 236); /* Default text color if one isnt established inside h1,h2, etc*/
+                font-family: Arial, sans-serif; /* Font style */
+
                 padding: 0;
                 overflow: hidden; /* Hides the scrollbar */
-                display: flex;
+
+                display: flex; /* Enables the flexbox layout */
+                flex-direction: column; /* Stacks item vertically*/
+
                 justify-content: center; /*Center canvas horizontally*/
                 align-items: center; /*Center canvas vertically*/
+
                 height: 100vh; /*full viewport height*/
             }
-            canvas{
+            h1{/* Styles the text above the canvas*/
+                margin-top: 20px; /* Space from the top of the page*/
+            }
+            /* Container for buttons */
+            .controls{
+                margin-top: 20px; /* Space betweeen canvas and button*/
+                /*display: none; /* Hides the button */
+                
+            }
+
+            /* Style the button */
+            button {
+                padding: 10px 20px; /* Size of the button */
+                font-size: 16px; /* Text size*/
+
+                background-color: #444; /* Dark grey background*/
+                color: white; /* Text color */
+                border: none; /* Removes default border */
+
+                border-radius: 6px; /* Rounds the corners of the button, higher value more round */
+                cursor: pointer; /* Shows pointer on hover, changes the mouse curser*/
+            }
+
+            /* When the button is pressed */
+            button:active{
+                background-color: #666; /* Changes the background color of the button to light grey*/
+            }
+            
+            canvas{/* Styles the game canvas*/
                 display: block; /*Remove inline spacing around canvas*/
                 border: 2px solid black; /*Optional border*/
             }
             </style>
     </head>
     <body>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <script type="module" src="main.js"></script>
+        <h1>Hello, I hope you have fun!</h1> <!-- This puts the text above the canvas -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas> <!-- Game Canvas -->
+        
+        <!-- Button container, holds the controls-->
+        <div class="controls">
+            <!-- Displays a single button with the words 'Jump' in it-->
+            <button id="leftBtn">U+2190</button>
+            <button id="jumpBtn">Jump</button> 
+            <button id="rightBtn">-></button>
+        </div>
+
+        <script type="module" src="main.js"></script> <!-- Loads the game code from the given file -->
     </body>
 </html>

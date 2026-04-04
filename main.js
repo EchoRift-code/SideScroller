@@ -2,21 +2,34 @@ import {level1} from "./levels/level1.js";
 //console.log(level1);
 let tileMap = level1;
 
+const jumpBtn = document.getElementById("jumpBtn"); // Get the button from HTML, created in index.html
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
 const canvas = document.getElementById("gameCanvas"); // Access canvas
 const draw = canvas.getContext("2d");
 
-let enemyX = 600, enemyY = 500;
+// Determine if game is being ran on a computer or a touch screen like a phone
+// ontouchstart in window = true if device supports touch
+// navigator.maxTouchPoints = number of touch points
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+if(isMobile){
+    document.querySelector(".control").style.display = "flex";
+}
+
 let gravity = 1;
-let canJump = true, canMove = true, onJumpPad = false;
-let spaceUsed = false, inAir = false;
+let canMove = true, onJumpPad = false;
+let jumped = false, inAir = false;
 let startMenu = true, setting = false, died = false, level1Active = false, level2 = false;
 let level1Complete = false;
 let startMenuActive = true, diedScreenActive = false;
-let startButton = { x: 375, y: 200, width: 150, height: 50};
-let settingButton = { x: 375, y: 275, width: 150, height: 50};
+let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
+let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
+let volumeButton = {x: canvas.width/2-50, y: 200, width: 150, height: 50}
 let restartButton = { x: 300, y: 275, width: 170, height: 50};
 let mainMenuButton = { x: 500, y: 275, width: 200, height: 50};
 let camera = { x : 0, y : 0};
+
+let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false}
 
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
@@ -24,10 +37,10 @@ let ogre = { x: 600, y: 500};
 let vampire = {x: 300, y: 500};
 
 let keys = {};
-document.addEventListener("keydown", (e)=>{keys[e.code]=true;});
-document.addEventListener("keyup", (e)=>{keys[e.code]=false;
-                            if(e.code == "Space"){
-                                spaceUsed = false; // Resets value when key is released
+document.addEventListener("keydown", (e)=>{keys[e.key]=true;});
+document.addEventListener("keyup", (e)=>{keys[e.key]=false;
+                            if(e.key == "ArrowUp"){
+                                jumped = false; // Resets value when key is released
                             }});
 
 canvas.addEventListener("click", (e) =>{
@@ -40,14 +53,14 @@ canvas.addEventListener("click", (e) =>{
         if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
             player.x = 50;
             player.y = 500;
-            startMenu = false;
-            startMenuActive = false;
+            screenActive.mainMenu = false;
             level1Active = true;
+            startMenuActive = false;     
         }
         if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
-            startMenu = false;
-            startMenuActive = false;
+            screenActive.mainMenu = false;
             setting = true;
+            startMenuActive = false;
         }
     }
     if(diedScreenActive){
@@ -61,7 +74,7 @@ canvas.addEventListener("click", (e) =>{
             player.y = 500;
         }
         if(mouseX >= mainMenuButton.x && mouseX <= mainMenuButton.x + mainMenuButton.width && mouseY >= mainMenuButton.y && mouseY <= mainMenuButton.y + mainMenuButton.height){                
-            startMenu = true; 
+            screenActive.mainMenu = true; 
             died = false;
             diedScreenActive = false;
                                 
@@ -69,6 +82,27 @@ canvas.addEventListener("click", (e) =>{
     }
 });
 
+// Add keys for buttons so they can be clicked
+leftBtn.onmousedown = () => keys["ArrowLeft"] = true;
+leftBtn.onmouseup = () => keys["ArrowLeft"] = false;
+
+rightBtn.onmousedown = () => keys["ArrowRight"] = true;
+rightBtn.onmouseup = () => keys["ArrowRight"] = false;
+
+jumpBtn.onmousedown = () => keys["ArrowUp"] = true;
+jumpBtn.onmouseup = () => keys["ArrowUp"] = false;
+
+// Add touch support for the buttons
+[leftBtn, rightBtn, jumpBtn].forEach(btn =>{
+    btn.ontouchstart = () => {  if(btn.id == "leftBtn") keys["ArrowLeft"] = true;  
+                                if(btn.id == "rightBtn") keys["ArrowRight"] = true;
+                                if(btn.id == "jumpBtn") keys["ArrowUp"] = true;
+                            };
+    btn.ontouchend = () => {    if(btn.id == "leftBtn") keys["ArrowLeft"] = false; 
+                                if(btn.id == "rightBtn") keys["ArrowRight"] = false;
+                                if(btn.id == "jumpBtn") keys["ArrowUp"] = false;
+                            };
+});
 
 let enemyImages = [];
 let ogreImage = new Image(), vampireImage = new Image();
@@ -173,19 +207,32 @@ function changeLevel(){
     level2 = true;
 }
 
+function drawGrid(){
+    for(let x = 0; x < 800; x ++){
+        for(let y = 0; y < 600; y++){
+            draw.fillRect(x*50,y*50, 50,2);
+            draw.fillRect(x*50,y*50, 2,50);
+        }
+    }
+}
+
 function gameLoop(){
     //console.log("Gameloop started");
     let pOldX = player.x, pOldY = player.y;
+    jumpBtn.onclick = function(){
+        console.log("Jump button clicked");
+    }
+
     // Player movement
     if(canMove && !inAir){
-        if(keys["Space"] && !spaceUsed){ 
+        if(keys["ArrowUp"] && !jumped){ 
             if(onJumpPad){
                 player.y -=150;
             }else{
                 player.y -= 100
             }
             onJumpPad = false;
-            spaceUsed = true;
+            jumped = true;
             inAir = true; 
             
         }  
@@ -195,8 +242,8 @@ function gameLoop(){
     player.y += gravity;
     updateCamera();
 
-    if(startMenu){
-        startMenuActive = true;
+    if(screenActive.mainMenu){
+        startMenuActive = true; // Makes sure the buttons are only clickable if in this screen
         // Background color
         draw.fillStyle = "black";
         draw.fillRect(0,0,canvas.width, canvas.height);
@@ -220,14 +267,14 @@ function gameLoop(){
 
         // Draw the rectangles for the button
         draw.fillStyle = "red";
-        draw.fillRect(startButton.x, startButton.y, startButton.width, startButton.height);
+        draw.fillRect(volumeButton.x, volumeButton.y, volumeButton.width, volumeButton.height);
         draw.fillRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
         
         // Draw the writing inside the buttons
         draw.fillStyle = "white";
         draw.font = "35px Arial";
-        draw.fillText("Volume", startButton.x+20, startButton.y+38);                 
-        draw.fillText("Mute", settingButton.x, settingButton.y+38); 
+        draw.fillText("Volume", volumeButton.x+15, volumeButton.y+38);                 
+        draw.fillText("Mute", settingButton.x+35, settingButton.y+38); 
     }
     
     if(died){
@@ -424,13 +471,9 @@ function gameLoop(){
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
 
         // Draw gridlines
-        //for(let x = 0; x < 800; x ++){
-            //  for(let y = 0; y < 600; y++){
-            //     draw.fillRect(x*50,y*50, 50,2);
-            //    draw.fillRect(x*50,y*50, 2,50);
-            //}
-        //}
+        
     }
+    //drawGrid();
     // Redraw frames
     requestAnimationFrame(gameLoop);
 }
