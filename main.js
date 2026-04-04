@@ -82,27 +82,27 @@ canvas.addEventListener("click", (e) =>{
     }
 });
 
-// Add keys for buttons so they can be clicked
-leftBtn.onmousedown = () => keys["ArrowLeft"] = true;
-leftBtn.onmouseup = () => keys["ArrowLeft"] = false;
-
-rightBtn.onmousedown = () => keys["ArrowRight"] = true;
-rightBtn.onmouseup = () => keys["ArrowRight"] = false;
-
-jumpBtn.onmousedown = () => keys["ArrowUp"] = true;
-jumpBtn.onmouseup = () => keys["ArrowUp"] = false;
+// Add keys for buttons so they can be clicked and touched with touchscreen
+if(jumpBtn){
+    jumpBtn.onmousedown = () => keys["ArrowUp"] = true;
+    jumpBtn.onmouseup = () => keys["ArrowUp"] = false;
+    jumpBtn.ontouchstart = () => keys["ArrowUp"] = true;
+    jumpBtn.ontouchend = () => keys["ArrowUp"] = false;
+}
+if(leftBtn){
+    leftBtn.onmousedown = () => keys["ArrowLeft"] = true;
+    leftBtn.onmouseup = () => keys["ArrowLeft"] = false;
+    leftBtn.ontouchstart = () => keys["ArrowLeft"] = true;
+    leftBtn.ontouchend = () => keys["ArrowLeft"] = false;
+}
+if(leftBtn){
+    rightBtn.onmousedown = () => keys["ArrowRight"] = true;
+    rightBtn.onmouseup = () => keys["ArrowRight"] = false;
+    rightBtn.ontouchstart = () => keys["ArrowRight"] = true;
+    rightBtn.ontouchend = () => keys["ArrowRight"] = false;
+}
 
 // Add touch support for the buttons
-[leftBtn, rightBtn, jumpBtn].forEach(btn =>{
-    btn.ontouchstart = () => {  if(btn.id == "leftBtn") keys["ArrowLeft"] = true;  
-                                if(btn.id == "rightBtn") keys["ArrowRight"] = true;
-                                if(btn.id == "jumpBtn") keys["ArrowUp"] = true;
-                            };
-    btn.ontouchend = () => {    if(btn.id == "leftBtn") keys["ArrowLeft"] = false; 
-                                if(btn.id == "rightBtn") keys["ArrowRight"] = false;
-                                if(btn.id == "jumpBtn") keys["ArrowUp"] = false;
-                            };
-});
 
 let enemyImages = [];
 let ogreImage = new Image(), vampireImage = new Image();
