@@ -396,7 +396,7 @@ function gameLoop(){
         //draw.fillStyle = "black";
         //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
-        console.log("Drawing image");
+        
     }
 
     if(level2){
