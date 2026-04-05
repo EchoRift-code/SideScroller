@@ -36,9 +36,10 @@ if(isMobile){
 }
 
 let gravity = 1.2;
-let canMove = true, onJumpPad = false;
-let jumped = false, inAir = false;
+let canMove = true, onJumpPad = false, jumped = false, inAir = false;
+
 let level1Complete = false;
+
 let startMenuActive = true, diedScreenActive = false;
 
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
@@ -49,7 +50,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false};
+let screenActive = {mainMenu: false, settings: false, died: false, level1Active: false, level2Active: true, level3Active: false, level4Active: true, level5Active: true};
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
 let ogre = { x: 600, y: 500};
@@ -181,8 +182,6 @@ if(rightBtn){
     });
 }
 
-
-
 function updateCamera(){
     
     const offsetX = 200;
@@ -209,6 +208,16 @@ function changeLevel(previousLevel){
         screenActive.level2Active = true;
     }else if(previousLevel == 2){
         screenActive.level2Active = false;
+        screenActive.level3Active = true;
+    }else if(previousLevel == 3){
+        screenActive.level3Active = false;
+        screenActive.level4Active = true;
+    }else if(previousLevel == 4){
+        screenActive.level4Active = false;
+        screenActive.level5Active = true;
+    }else if(previousLevel == 5){
+        screenActive.level5Active = false;
+        //screenActive.level2Active = false;
     }
     
     player.x = 50;
@@ -354,7 +363,8 @@ function gameLoop(){
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         player.y = pOldY;
                         inAir = false;
-                    }               
+                    }  
+                                
                 }
                 if(tileMap[row][col] == 5){
                     // Once the player starts falling they can no longer move
@@ -395,6 +405,7 @@ function gameLoop(){
         //draw.fillStyle = "black";
         //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
+        
         if(level1Complete){
             draw.fillStyle = "black";
             draw.fillRect(0, 0, canvas.width, canvas.height);
@@ -447,7 +458,8 @@ function gameLoop(){
                         player.y = pOldY;
                         inAir = false;
                         //console.log("Under tile");
-                    }      
+                    }     
+                     
                 }
                 if(map2[row][col] == 5){
                     // Once the player starts falling they can no longer move
@@ -474,8 +486,12 @@ function gameLoop(){
                 }
             }
         }
-        ogre.x = 600
-        draw.drawImage(tiles[0], ogre.x - camera.x, ogre.y - camera.y);
+        ogre.x = 200;
+        draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
+        ogre.x = 600;
+        draw.drawImage(enemyImages[1], ogre.x - camera.x, ogre.y - camera.y);
+        ogre.x = 950;
+        draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         
     }
