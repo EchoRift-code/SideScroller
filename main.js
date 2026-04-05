@@ -35,7 +35,8 @@ if(isMobile){
     document.querySelector(".controls").style.display = "flex";
 }
 
-let gravity = 1.2;
+let gravity = 1;
+let velocityY = 0;
 let canMove = true, onJumpPad = false, jumped = false, inAir = false;
 
 let level1Complete = false;
@@ -50,7 +51,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: false, settings: false, died: false, level1Active: false, level2Active: true, level3Active: false, level4Active: true, level5Active: true};
+let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
 let ogre = { x: 600, y: 500};
@@ -238,12 +239,12 @@ function gameLoop(){
     let pOldX = player.x, pOldY = player.y;
 
     // Player movement
-    if(canMove && !inAir){
+    if(canMove){
         if(keys["ArrowUp"] && !jumped){ 
             if(onJumpPad){
-                player.y -=150;
+                velocityY = -25;
             }else{
-                player.y -= 100
+                velocityY = -15;
             }
             onJumpPad = false;
             jumped = true;
@@ -253,7 +254,8 @@ function gameLoop(){
     }         
     
     // Bring the player back down
-    player.y += gravity;
+    velocityY += gravity; // with gravity the 
+    player.y += velocityY;
     updateCamera();
 
     if(screenActive.mainMenu){
@@ -360,11 +362,32 @@ function gameLoop(){
                 let tileY = row * 50;
                 //  Prevents player from falling through floor while gravity if constantly active
                 if(tileMap[row][col] == 4){
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        player.y = pOldY;
-                        inAir = false;
-                    }  
-                                
+                    if(player.x < tileX + 50 &&
+                    player.x + player.width > tileX &&
+                    player.y < tileY + 50 &&
+                    player.y + player.height > tileY){
+
+                        // Landing on top
+                        if(pOldY + player.height <= tileY){
+                            player.y = tileY - player.height;
+                            velocityY = 0;
+                            inAir = false;
+                        }
+
+                        // Hitting head
+                        else if(pOldY >= tileY + 50){
+                            player.y = tileY + 50;
+                            velocityY = 0;
+                        }
+
+                        // Side collisions
+                        else if(pOldX + player.width <= tileX){
+                            player.x = tileX - player.width;
+                        }
+                        else if(pOldX >= tileX + 50){
+                            player.x = tileX + 50;
+                        }
+                    }
                 }
                 if(tileMap[row][col] == 5){
                     // Once the player starts falling they can no longer move
@@ -453,13 +476,33 @@ function gameLoop(){
                 let tileX = col * 50;
                 let tileY = row * 50;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(map2[row][col] == 4){
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        player.y = pOldY;
-                        inAir = false;
-                        //console.log("Under tile");
-                    }     
-                     
+                if(tileMap[row][col] == 4){
+                    if(player.x < tileX + 50 &&
+                    player.x + player.width > tileX &&
+                    player.y < tileY + 50 &&
+                    player.y + player.height > tileY){
+
+                        // Landing on top
+                        if(pOldY + player.height <= tileY){
+                            player.y = tileY - player.height;
+                            velocityY = 0;
+                            inAir = false;
+                        }
+
+                        // Hitting head
+                        else if(pOldY >= tileY + 50){
+                            player.y = tileY + 50;
+                            velocityY = 0;
+                        }
+
+                        // Side collisions
+                        else if(pOldX + player.width <= tileX){
+                            player.x = tileX - player.width;
+                        }
+                        else if(pOldX >= tileX + 50){
+                            player.x = tileX + 50;
+                        }
+                    }
                 }
                 if(map2[row][col] == 5){
                     // Once the player starts falling they can no longer move
@@ -486,14 +529,16 @@ function gameLoop(){
                 }
             }
         }
+        // Draw the enemies
         ogre.x = 200;
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
         ogre.x = 600;
         draw.drawImage(enemyImages[1], ogre.x - camera.x, ogre.y - camera.y);
         ogre.x = 950;
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
-        draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         
+        
+        draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
     }
     //drawGrid();
     // Redraw frames
