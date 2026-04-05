@@ -47,7 +47,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: false, settings: false, died: false, level1Active: false, level2Active: true};
+let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false};
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
 let ogre = { x: 600, y: 500};
