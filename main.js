@@ -2,6 +2,22 @@ import {level1} from "./levels/level1.js";
 //console.log(level1);
 let tileMap = level1;
 
+window.onerror = function(message, source, lineno, colno, error){
+    const log = document.createElement("div");
+    log.style.position = "fixed";
+    log.style.top = "0";
+    log.style.left = "0";
+    log.style.width = "100%";
+    log.style.backgroundColor = "red";
+    log.style.color = "white";
+    log.style.fontSize = "14px";
+    log.style.zIndex = 9999;
+    log.style.padding = "5px";
+    log.textContent = message + " at " + lineno + ": " + colno;
+    document.body.appendChild(log);
+    return false;
+};
+
 const jumpBtn = document.getElementById("jumpBtn"); // Get the button from HTML, created in index.html
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
