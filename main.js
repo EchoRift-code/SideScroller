@@ -28,6 +28,7 @@ const draw = canvas.getContext("2d");
 // ontouchstart in window = true if device supports touch
 // navigator.maxTouchPoints = number of touch points
 const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
 if(isMobile){
     document.querySelector(".controls").style.display = "flex";
 }

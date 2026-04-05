@@ -31,10 +31,31 @@
             /* Container for buttons */
             .controls{
                 margin-top: 20px; /* Space betweeen canvas and button*/
-                /*display: none;  Hides the button */
+                display: flex; /* Arranges the buttons in a row*/
+                
+                justify-content: space-around; /* space between buttons*/
+                align-items: center; /* Vertically center */
+
+                gap: 20px; /* optional, extra space between buttons*/
+                position: absolute; /* keep the buttons on top of the canvas*/
+                bottom: 20px; /* distance from the bottom */
+                left: 50%; /* distance from the left side of the screen */
+                transform: translateX(-50%); /* center horizontally */
             }
 
-            /* Style the button */
+            /* This will only change the size of the buttons in this container*/
+            .controls button{
+                width: 100px;
+                height: 60px;
+                font-size: 40px;
+                border-radius: 10px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+            }
+
+            /* Style all buttons globally */
             button {
                 padding: 10px 20px; /* Size of the button */
                 font-size: 16px; /* Text size*/
@@ -59,12 +80,13 @@
             </style>
     </head>
     <body>
-        <h1>Are you loading?</h1> <!-- This puts the text above the canvas -->
+        <h1>Hello my trusted game tester.</h1> <!-- This puts the text above the canvas -->
+        <h2>I hope you have fun! (No feedback wanted XD)</h2>
         <canvas id="gameCanvas" width="800" height="600"></canvas> <!-- Game Canvas -->
         
         <!-- Button container, holds the controls-->
         <div class="controls"
-            style="display: none;">
+            style="display: none;"> <!-- Buttons will stay hidden until it senses a touchscreen, check main.js-->
             
             <!-- Displays a single button with the words 'Jump' in it-->
             <!-- window + . opens emoji picker-->
