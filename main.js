@@ -103,20 +103,26 @@ canvas.addEventListener("click", (e) =>{
 if(jumpBtn){
     jumpBtn.onmousedown = () => keys["ArrowUp"] = true;
     jumpBtn.onmouseup = () => keys["ArrowUp"] = false;
+    jumpBtn.onmouseleave = () => keys["ArrowUp"] = false;
     jumpBtn.ontouchstart = () => keys["ArrowUp"] = true;
     jumpBtn.ontouchend = () => keys["ArrowUp"] = false;
+    jumpBtn.ontouchcancel = () => keys["ArrowUp"] = false;
 }
 if(leftBtn){
     leftBtn.onmousedown = () => keys["ArrowLeft"] = true;
     leftBtn.onmouseup = () => keys["ArrowLeft"] = false;
+    leftBtn.onmouseleave = () => keys["ArrowUp"] = false;
     leftBtn.ontouchstart = () => keys["ArrowLeft"] = true;
     leftBtn.ontouchend = () => keys["ArrowLeft"] = false;
+    leftBtn.ontouchcancel = () => keys["ArrowUp"] = false;
 }
 if(leftBtn){
     rightBtn.onmousedown = () => keys["ArrowRight"] = true;
     rightBtn.onmouseup = () => keys["ArrowRight"] = false;
+    rightBtn.onmouseleave = () => keys["ArrowUp"] = false;
     rightBtn.ontouchstart = () => keys["ArrowRight"] = true;
     rightBtn.ontouchend = () => keys["ArrowRight"] = false;
+    rightBtn.ontouchcancel = () => keys["ArrowUp"] = false;
 }
 
 // Add touch support for the buttons
@@ -236,9 +242,6 @@ function drawGrid(){
 function gameLoop(){
     //console.log("Gameloop started");
     let pOldX = player.x, pOldY = player.y;
-    jumpBtn.onclick = function(){
-        console.log("Jump button clicked");
-    }
 
     // Player movement
     if(canMove && !inAir){
