@@ -31,8 +31,7 @@
             /* Container for buttons */
             .controls{
                 margin-top: 20px; /* Space betweeen canvas and button*/
-                /*display: none; /* Hides the button */
-                
+                /*display: none;  Hides the button */
             }
 
             /* Style the button */
@@ -64,7 +63,9 @@
         <canvas id="gameCanvas" width="800" height="600"></canvas> <!-- Game Canvas -->
         
         <!-- Button container, holds the controls-->
-        <div class="controls">
+        <div class="controls"
+            style="display: none;">
+            
             <!-- Displays a single button with the words 'Jump' in it-->
             <!-- window + . opens emoji picker-->
             <button id="leftBtn">⬅️</button>
