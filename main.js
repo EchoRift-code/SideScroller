@@ -1,6 +1,6 @@
 import {level1} from "./levels/level1.js";
-//console.log(level1);
-let tileMap = level1;
+import {level2} from "./levels/level2.js";
+let tileMap = level1, map2 = level2;
 
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
@@ -36,18 +36,18 @@ if(isMobile){
 let gravity = 1;
 let canMove = true, onJumpPad = false;
 let jumped = false, inAir = false;
-let startMenu = true, setting = false, died = false, level1Active = false, level2 = false;
 let level1Complete = false;
 let startMenuActive = true, diedScreenActive = false;
+
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
 let volumeButton = {x: canvas.width/2-50, y: 200, width: 150, height: 50}
-let restartButton = { x: 300, y: 275, width: 170, height: 50};
-let mainMenuButton = { x: 500, y: 275, width: 200, height: 50};
+let restartButton = { x: 205, y: 275, width: 170, height: 50};
+let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
+
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false}
-
+let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false};
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
 let ogre = { x: 600, y: 500};
@@ -71,12 +71,12 @@ canvas.addEventListener("click", (e) =>{
             player.x = 50;
             player.y = 500;
             screenActive.mainMenu = false;
-            level1Active = true;
+            screenActive.level1Active = true;
             startMenuActive = false;     
         }
         if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
             screenActive.mainMenu = false;
-            setting = true;
+            screenActive.settings = true;
             startMenuActive = false;
         }
     }
@@ -84,15 +84,15 @@ canvas.addEventListener("click", (e) =>{
         if(mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width && mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height){
             player.x = 50;
             player.y = 500;
-            died = false;
+            screenActive.died = false;
             diedScreenActive = false;
-            level1Active = true;
+            screenActive.level1Active = true;
             player.x = 50;
             player.y = 500;
         }
         if(mouseX >= mainMenuButton.x && mouseX <= mainMenuButton.x + mainMenuButton.width && mouseY >= mainMenuButton.y && mouseY <= mainMenuButton.y + mainMenuButton.height){                
             screenActive.mainMenu = true; 
-            died = false;
+            screenActive.died = false;
             diedScreenActive = false;
                                 
         }
@@ -179,8 +179,6 @@ if(rightBtn){
     });
 }
 
-// Add touch support for the buttons
-
 let enemyImages = [];
 let ogreImage = new Image(), vampireImage = new Image();
 ogreImage.src = "images/ogreT.png", vampireImage.src = "images/vampireT.png";
@@ -211,11 +209,10 @@ fPlayerImage.onload = () => {
 let images = [];
 // Create image objects
 let background = new Image(), cloud1 = new Image(), cloud2 = new Image(), cloud3 = new Image(), ground = new Image(), firePit = new Image();
-let exitDoor = new Image(), jumpPad = new Image(), topLeftDoor = new Image(), bottomLeftDoor = new Image(), topRightDoor = new Image(), bottomRightDoor = new Image();
-background.src = "images/background1.png", cloud1.src = "images/cloud1.png";
-cloud2.src = "images/cloud2.png", cloud3.src = "images/cloud3.png";
-ground.src = "images/ground.png", firePit.src = "images/firePit.png";
-exitDoor.src = "images/exitDoor.png", jumpPad.src = "images/jumpPad.png";
+let jumpPad = new Image(), topLeftDoor = new Image(), bottomLeftDoor = new Image(), topRightDoor = new Image(), bottomRightDoor = new Image();
+
+background.src = "images/background1.png", cloud1.src = "images/cloud1.png", cloud2.src = "images/cloud2.png", cloud3.src = "images/cloud3.png";
+ground.src = "images/ground.png", firePit.src = "images/firePit.png", jumpPad.src = "images/jumpPadT50x10.png";
 topLeftDoor.src = "images/doorTopLeft.png", bottomLeftDoor.src = "images/doorBottomLeft.png", topRightDoor.src = "images/doorTopRight.png", bottomRightDoor.src = "images/doorBottomRight.png";
 
 // Add the images to the array
@@ -225,12 +222,11 @@ images.push(cloud2);
 images.push(cloud3);
 images.push(ground);
 images.push(firePit);
-images.push(exitDoor);
 images.push(jumpPad);
-images.push(topLeftDoor); // 8
-images.push(bottomLeftDoor); // 9
-images.push(topRightDoor); // 10
-images.push(bottomRightDoor); // 11
+images.push(topLeftDoor); // 7
+images.push(bottomLeftDoor); // 8
+images.push(topRightDoor); // 9
+images.push(bottomRightDoor); // 10
 
 let imagesLoaded = 0;
 // Loop through every image in the images array
@@ -273,15 +269,15 @@ function updateCamera(){
 }
 
 function changeState(){
-    died = false;
-    level1Active = true;
+    screenActive.died = false;
+    screenActive.level1Active = true;
     player.x = 50;
     player.y = 500;
 }
 
 function changeLevel(){
-    level1Active = false;
-    level2 = true;
+    screenActive.level1Active = false;
+    screenActive.level2 = true;
 }
 
 function drawGrid(){
@@ -333,7 +329,7 @@ function gameLoop(){
         draw.fillText("START", startButton.x+20, startButton.y+38);                 
         draw.fillText("SETTING", settingButton.x, settingButton.y+38);         
     }
-    if(setting){
+    if(screenActive.settings){
         
         // Background color
         draw.fillStyle = "black";
@@ -351,14 +347,14 @@ function gameLoop(){
         draw.fillText("Mute", settingButton.x+35, settingButton.y+38); 
     }
     
-    if(died){
+    if(screenActive.died){
         diedScreenActive = true;
         draw.fillStyle = "black";
         draw.fillRect(0,0,canvas.width, canvas.height);
 
         draw.font = "50px Arial";
         draw.fillStyle = "white";
-        draw.fillText("Game Over!", 350,250);
+        draw.fillText("Game Over!", 260,250);
 
         draw.fillStyle = "red";
         draw.fillRect(restartButton.x, restartButton.y, restartButton.width, restartButton.height);
@@ -367,12 +363,12 @@ function gameLoop(){
         draw.fillStyle = "white";
         draw.font = "35px Arial";
         draw.fillText("RESTART", restartButton.x+5, restartButton.y+38);                 
-        draw.fillText("MAIN MENU", mainMenuButton.x, mainMenuButton.y+38);
+        draw.fillText("MENU", mainMenuButton.x+30, mainMenuButton.y+38);
 
         // Will call function after the set time. 3000 = 3 seconds
         //setTimeout(changeState, 3000);
     }
-    if(level1Active){
+    if(screenActive.level1Active){
         //console.log("Level 1 active");
         // Calculate the total width of the game world (not the screen)
         // tileMap[0].length = number of columns (tiles) in the map
@@ -428,16 +424,11 @@ function gameLoop(){
                     }
                     // Wont trigger until player character has gone down the hole
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY + 50){                                     
-                        died = true;
-                        level1Active = false;                          
+                        screenActive.died = true;
+                        screenActive.level1Active = false;                          
                     }
-                }
-                if(tileMap[row][col] == 6){
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        level1Complete = true;                              
-                    }
-                }
-                if(tileMap[row][col] == 7){                    
+                }   
+                if(tileMap[row][col] == 6){                    
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         console.log("On jump pad");
                         player.x = pOldX;
@@ -445,9 +436,25 @@ function gameLoop(){
                         onJumpPad = true;             
                     }
                 }
+                if(tileMap[row][col] == 7 || tileMap[row][col] == 8){
+                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
+                        level1Complete = true;                              
+                    }
+                }
             }
         }
         
+        // The ogre inside the 50x50 tile is 13-37 wide
+        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + 50 && player.y + player.height > ogre.y){           
+            screenActive.died = true;  
+            screenActive.level1Active = false;                          
+        }
+        // Enemy
+        draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
+        // Player
+        //draw.fillStyle = "black";
+        //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
+        draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         if(level1Complete){
             draw.fillStyle = "black";
             draw.fillRect(0, 0, canvas.width, canvas.height);
@@ -458,22 +465,9 @@ function gameLoop(){
 
             setTimeout(changeLevel, 3000);
         }
-
-        // The ogre inside the 50x50 tile is 13-37 wide
-        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + 50 && player.y + player.height > ogre.y){           
-            died = true;  
-            level1Active = false;                          
-        }
-        // Enemy
-        draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
-        // Player
-        //draw.fillStyle = "black";
-        //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
-        draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
-        
     }
 
-    if(level2){
+    if(screenActive.level2Active){
         draw.fillStyle = "yellow";
         draw.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -524,28 +518,25 @@ function gameLoop(){
                     }
                     // Wont trigger until player character has gone down the hole
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY + 50){                                     
-                        died = true;
-                        level1Active = false;                          
+                        screenActive.died = true;
+                        screenActive.level1Active = false;                          
                     }
                 }
-                if(tileMap2[row][col] == 6){
+                if(tileMap2[row][col] == 6 ){
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         //level1Complete = true;                              
                     }
                 }
                 if(tileMap2[row][col] == 7){                    
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        //console.log("On jump pad");
                         onJumpPad = true;             
                     }
                 }
             }
         }
-        enemyX = 400
-        draw.drawImage(ogreImage, enemyX - camera.x, enemyY - camera.y);
+        ogre.x = 400
+        draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
-
-        // Draw gridlines
         
     }
     //drawGrid();
