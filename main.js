@@ -101,28 +101,82 @@ canvas.addEventListener("click", (e) =>{
 
 // Add keys for buttons so they can be clicked and touched with touchscreen
 if(jumpBtn){
-    jumpBtn.onmousedown = () => keys["ArrowUp"] = true;
-    jumpBtn.onmouseup = () => keys["ArrowUp"] = false;
-    jumpBtn.onmouseleave = () => keys["ArrowUp"] = false;
-    jumpBtn.ontouchstart = () => keys["ArrowUp"] = true;
-    jumpBtn.ontouchend = () => keys["ArrowUp"] = false;
-    jumpBtn.ontouchcancel = () => keys["ArrowUp"] = false;
+    jumpBtn.addEventListener("mousedown", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = true;
+    });
+    jumpBtn.addEventListener("mouseup", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = false;
+    });
+    jumpBtn.addEventListener("mouseleave", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = false;
+    });
+    jumpBtn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = true;
+    });
+    jumpBtn.addEventListener("touchend", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = false;
+    });
+    jumpBtn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        keys["ArrowUp"] = false;
+    });
 }
 if(leftBtn){
-    leftBtn.onmousedown = () => keys["ArrowLeft"] = true;
-    leftBtn.onmouseup = () => keys["ArrowLeft"] = false;
-    leftBtn.onmouseleave = () => keys["ArrowUp"] = false;
-    leftBtn.ontouchstart = () => keys["ArrowLeft"] = true;
-    leftBtn.ontouchend = () => keys["ArrowLeft"] = false;
-    leftBtn.ontouchcancel = () => keys["ArrowUp"] = false;
+    leftBtn.addEventListener("mousedown", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = true;
+    });
+    leftBtn.addEventListener("mouseup", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = false;
+    });
+    leftBtn.addEventListener("mouseleave", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = false;
+    });
+    leftBtn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = true;
+    });
+    leftBtn.addEventListener("touchend", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = false;
+    });
+    leftBtn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        keys["ArrowLeft"] = false;
+    });
 }
-if(leftBtn){
-    rightBtn.onmousedown = () => keys["ArrowRight"] = true;
-    rightBtn.onmouseup = () => keys["ArrowRight"] = false;
-    rightBtn.onmouseleave = () => keys["ArrowUp"] = false;
-    rightBtn.ontouchstart = () => keys["ArrowRight"] = true;
-    rightBtn.ontouchend = () => keys["ArrowRight"] = false;
-    rightBtn.ontouchcancel = () => keys["ArrowUp"] = false;
+if(rightBtn){
+    rightBtn.addEventListener("mousedown", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = true;
+    });
+    rightBtn.addEventListener("mouseup", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = false;
+    });
+    rightBtn.addEventListener("mouseleave", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = false;
+    });
+    rightBtn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = true;
+    });
+    rightBtn.addEventListener("touchend", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = false;
+    });
+    rightBtn.addEventListener("touchcancel", e => {
+        e.preventDefault();
+        keys["ArrowRight"] = false;
+    });
 }
 
 // Add touch support for the buttons
