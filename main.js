@@ -47,7 +47,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false};
+let screenActive = {mainMenu: false, settings: false, died: false, level1Active: false, level2Active: true};
 
 let player = { x: 50, y: 500, width: 50, height: 50 };
 let ogre = { x: 600, y: 500};
@@ -212,7 +212,7 @@ let background = new Image(), cloud1 = new Image(), cloud2 = new Image(), cloud3
 let jumpPad = new Image(), topLeftDoor = new Image(), bottomLeftDoor = new Image(), topRightDoor = new Image(), bottomRightDoor = new Image();
 
 background.src = "images/background1.png", cloud1.src = "images/cloud1.png", cloud2.src = "images/cloud2.png", cloud3.src = "images/cloud3.png";
-ground.src = "images/ground.png", firePit.src = "images/firePit.png", jumpPad.src = "images/jumpPadT50x10.png";
+ground.src = "images/ground.png", firePit.src = "images/firePit.png", jumpPad.src = "images/jumpPad.png";
 topLeftDoor.src = "images/doorTopLeft.png", bottomLeftDoor.src = "images/doorBottomLeft.png", topRightDoor.src = "images/doorTopRight.png", bottomRightDoor.src = "images/doorBottomRight.png";
 
 // Add the images to the array
@@ -275,9 +275,16 @@ function changeState(){
     player.y = 500;
 }
 
-function changeLevel(){
-    screenActive.level1Active = false;
-    screenActive.level2Active = true;
+function changeLevel(previousLevel){
+    if(previousLevel == 1){
+        screenActive.level1Active = false;
+        screenActive.level2Active = true;
+    }else if(previousLevel == 2){
+        screenActive.level2Active = false;
+    }
+    
+    player.x = 50;
+    player.y = 500;
 }
 
 function drawGrid(){
@@ -461,9 +468,9 @@ function gameLoop(){
 
             draw.fillStyle = "green";
             draw.font = ("50px Arial");
-            draw.fillText("You beat level 1!", 300, 300);
+            draw.fillText("You beat level 1!", 215, 300);
 
-            setTimeout(changeLevel, 3000);
+            setTimeout(changeLevel, 3000, 1);
         }
     }
 
@@ -471,7 +478,7 @@ function gameLoop(){
         draw.fillStyle = "yellow";
         draw.fillRect(0, 0, canvas.width, canvas.height);
 
-        const worldWidth = tileMap2[0].length * 50;
+        const worldWidth = map2[0].length * 50;
 
         // Check if the right arrow key is being pressed
         // AND make sure the player does NOT move past the right edge of the world
@@ -486,9 +493,9 @@ function gameLoop(){
             player.x = pOldX;
         }       
 
-        for(let row = 0; row < tileMap2.length; row++){
-            for(let col = 0; col < tileMap2[row].length; col++){
-                const tileIndex = tileMap2[row][col]; // Get number from tilemap
+        for(let row = 0; row < map2.length; row++){
+            for(let col = 0; col < map2[row].length; col++){
+                const tileIndex = map2[row][col]; // Get number from tilemap
                 const tileImage = images[tileIndex]; // Get the corresponding image from the images[]
                 const screenX = col * 50 - camera.x;
                 const screenY = row * 50 - camera.y;
@@ -497,19 +504,19 @@ function gameLoop(){
             }   
         }
 
-        for(let row = 0; row < tileMap2.length; row++){
-            for(let col = 0; col < tileMap2[row].length; col++){
+        for(let row = 0; row < map2.length; row++){
+            for(let col = 0; col < map2[row].length; col++){
                 let tileX = col * 50;
                 let tileY = row * 50;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(tileMap2[row][col] == 4){
+                if(map2[row][col] == 4){
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         player.y = pOldY;
                         inAir = false;
                         //console.log("Under tile");
                     }      
                 }
-                if(tileMap2[row][col] == 5){
+                if(map2[row][col] == 5){
                     // Once the player starts falling they can no longer move
                     if(player.y+50 > tileY+1){
                         canMove = false;
@@ -522,19 +529,19 @@ function gameLoop(){
                         screenActive.level1Active = false;                          
                     }
                 }
-                if(tileMap2[row][col] == 6 ){
+                if(map2[row][col] == 6 ){
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         //level1Complete = true;                              
                     }
                 }
-                if(tileMap2[row][col] == 7){                    
+                if(map2[row][col] == 7){                    
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
                         onJumpPad = true;             
                     }
                 }
             }
         }
-        ogre.x = 400
+        ogre.x = 600
         draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         
