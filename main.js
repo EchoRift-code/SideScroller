@@ -277,7 +277,7 @@ function changeState(){
 
 function changeLevel(){
     screenActive.level1Active = false;
-    screenActive.level2 = true;
+    screenActive.level2Active = true;
 }
 
 function drawGrid(){
