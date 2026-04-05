@@ -2,6 +2,8 @@ import {level1} from "./levels/level1.js";
 //console.log(level1);
 let tileMap = level1;
 
+alert("JS is running");
+
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
     log.style.position = "fixed";
