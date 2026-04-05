@@ -1,6 +1,8 @@
 import {level1} from "./levels/level1.js";
 import {level2} from "./levels/level2.js";
+import {menuBackground, fPlayerImage, enemyImages, tiles} from "./loadImages.js";
 let tileMap = level1, map2 = level2;
+//console.log("hello");
 
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
@@ -33,7 +35,7 @@ if(isMobile){
     document.querySelector(".controls").style.display = "flex";
 }
 
-let gravity = 1;
+let gravity = 1.2;
 let canMove = true, onJumpPad = false;
 let jumped = false, inAir = false;
 let level1Complete = false;
@@ -179,81 +181,7 @@ if(rightBtn){
     });
 }
 
-let enemyImages = [];
-let ogreImage = new Image(), vampireImage = new Image();
-ogreImage.src = "images/ogreT.png", vampireImage.src = "images/vampireT.png";
 
-enemyImages.push(ogreImage);
-enemyImages.push(vampireImage);
-
-let enemiesLoaded = 0;
-// Loop through every image in the images array
-for (let i = 0; i < enemyImages.length; i++) {
-    enemyImages[i].onload = () => {
-        console.log(enemyImages[i], "has loaded.");
-        enemiesLoaded++;
-
-        if (enemiesLoaded == enemyImages.length) {
-            console.log("Enemies are loaded");
-        }
-    };
-}
-
-let fPlayerImage = new Image();
-fPlayerImage.src = "images/femalePlayerT.png";
-fPlayerImage.onload = () => {
-    console.log("Loaded player");
-};
-
-// Empty array to store the images
-let images = [];
-// Create image objects
-let background = new Image(), cloud1 = new Image(), cloud2 = new Image(), cloud3 = new Image(), ground = new Image(), firePit = new Image();
-let jumpPad = new Image(), topLeftDoor = new Image(), bottomLeftDoor = new Image(), topRightDoor = new Image(), bottomRightDoor = new Image();
-
-background.src = "images/background1.png", cloud1.src = "images/cloud1.png", cloud2.src = "images/cloud2.png", cloud3.src = "images/cloud3.png";
-ground.src = "images/ground.png", firePit.src = "images/firePit.png", jumpPad.src = "images/jumpPad.png";
-topLeftDoor.src = "images/doorTopLeft.png", bottomLeftDoor.src = "images/doorBottomLeft.png", topRightDoor.src = "images/doorTopRight.png", bottomRightDoor.src = "images/doorBottomRight.png";
-
-// Add the images to the array
-images.push(background);
-images.push(cloud1);
-images.push(cloud2);
-images.push(cloud3);
-images.push(ground);
-images.push(firePit);
-images.push(jumpPad);
-images.push(topLeftDoor); // 7
-images.push(bottomLeftDoor); // 8
-images.push(topRightDoor); // 9
-images.push(bottomRightDoor); // 10
-
-let imagesLoaded = 0;
-// Loop through every image in the images array
-for (let i = 0; i < images.length; i++) {
-
-    // Assign an "onload" event to each image
-    // This function runs ONLY when that specific image finishes loading
-    images[i].onload = () => {
-
-        // Log which image finished loading
-        // NOTE: Using images[i] here can be unreliable because when this runs,
-        // the loop may have already finished and i may no longer point to the correct index
-        console.log(images[i], "has loaded.");
-
-        // Increase the counter to track how many images have finished loading
-        imagesLoaded++;
-
-        // Check if ALL images have finished loading
-        // images.length = total number of images we are waiting on
-        if (imagesLoaded == images.length) {
-
-            // Once ALL images are loaded, start the game loop
-            // This prevents the game from trying to draw images that aren't ready yet
-            gameLoop();
-        }
-    };
-}
 
 function updateCamera(){
     
@@ -295,7 +223,7 @@ function drawGrid(){
         }
     }
 }
-
+//console.log("hello again");
 function gameLoop(){
     //console.log("Gameloop started");
     let pOldX = player.x, pOldY = player.y;
@@ -320,15 +248,21 @@ function gameLoop(){
     updateCamera();
 
     if(screenActive.mainMenu){
+        //console.log("We in the menu");
         startMenuActive = true; // Makes sure the buttons are only clickable if in this screen
         // Background color
-        draw.fillStyle = "black";
-        draw.fillRect(0,0,canvas.width, canvas.height);
-
+        //draw.fillStyle = "black";
+        //draw.fillRect(0,0,canvas.width, canvas.height);    
+        
+        draw.drawImage(menuBackground, 0, 0);
+    
         // Draw the rectangles for the button
-        draw.fillStyle = "red";
-        draw.fillRect(startButton.x, startButton.y, startButton.width, startButton.height);
-        draw.fillRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
+        //draw.fillStyle = "red";
+        //draw.fillRect(startButton.x, startButton.y, startButton.width, startButton.height);
+        //draw.fillRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
+
+        draw.strokeRect(startButton.x, startButton.y, startButton.width, startButton.height);
+        draw.strokeRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
         
         // Draw the writing inside the buttons
         draw.fillStyle = "white";
@@ -400,7 +334,7 @@ function gameLoop(){
         for(let row = 0; row < tileMap.length; row++){
             for(let col = 0; col < tileMap[row].length; col++){
                 const tileIndex = tileMap[row][col]; // Get number from tilemap
-                const tileImage = images[tileIndex]; // Get the corresponding image from the images[]
+                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
                 if(!tileImage.complete) continue;
                 const screenX = col * 50 - camera.x;
                 const screenY = row * 50 - camera.y;
@@ -437,9 +371,8 @@ function gameLoop(){
                 }   
                 if(tileMap[row][col] == 6){                    
                     if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        console.log("On jump pad");
-                        player.x = pOldX;
-                        
+                        //console.log("On jump pad");
+                        player.x = pOldX;      
                         onJumpPad = true;             
                     }
                 }
@@ -457,7 +390,7 @@ function gameLoop(){
             screenActive.level1Active = false;                          
         }
         // Enemy
-        draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
+        draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
         // Player
         //draw.fillStyle = "black";
         //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
@@ -491,12 +424,12 @@ function gameLoop(){
             player.x -=2;
         }else{
             player.x = pOldX;
-        }       
+        }
 
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){
                 const tileIndex = map2[row][col]; // Get number from tilemap
-                const tileImage = images[tileIndex]; // Get the corresponding image from the images[]
+                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
                 const screenX = col * 50 - camera.x;
                 const screenY = row * 50 - camera.y;
                 
@@ -542,11 +475,13 @@ function gameLoop(){
             }
         }
         ogre.x = 600
-        draw.drawImage(ogreImage, ogre.x - camera.x, ogre.y - camera.y);
+        draw.drawImage(tiles[0], ogre.x - camera.x, ogre.y - camera.y);
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         
     }
     //drawGrid();
     // Redraw frames
     requestAnimationFrame(gameLoop);
+    
 }
+gameLoop();
