@@ -1,8 +1,7 @@
 import {level1} from "./levels/level1.js";
 import {level2} from "./levels/level2.js";
 import {menuBackground, fPlayerImage, enemyImages, tiles} from "./loadImages.js";
-let tileMap = level1, map2 = level2;
-//console.log("hello");
+let map1 = level1, map2 = level2;
 
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
@@ -35,14 +34,19 @@ if(isMobile){
     document.querySelector(".controls").style.display = "flex";
 }
 
-let gravity = 1;
-let velocityY = 0;
-let canMove = true, onJumpPad = false, jumped = false, inAir = false;
+let gravity = 0.8; // what changes the speed in how fast you fall each frame
+let velocityY = 0; // how fast your moving
+
+const tileSize = 50;
+
+let canMove = true, onJumpPad = false, onGround = false;
 
 let level1Complete = false;
 
+// what screen is active for the buttons to be usable
 let startMenuActive = true, diedScreenActive = false;
 
+// Buttons
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
 let volumeButton = {x: canvas.width/2-50, y: 200, width: 150, height: 50}
@@ -53,7 +57,7 @@ let camera = { x : 0, y : 0};
 
 let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
 
-let player = { x: 50, y: 500, width: 50, height: 50 };
+let player = { x: 50, y: 500, width: 50, height: 50, speed: 3, fromLeft: 14, fromRight: 14, fromTop: 8};
 let ogre = { x: 600, y: 500};
 let vampire = {x: 300, y: 500};
 
@@ -61,7 +65,7 @@ let keys = {};
 document.addEventListener("keydown", (e)=>{keys[e.key]=true;});
 document.addEventListener("keyup", (e)=>{keys[e.key]=false;
                             if(e.key == "ArrowUp"){
-                                jumped = false; // Resets value when key is released
+                                //onGround = false; // Resets value when key is released
                             }});
 
 canvas.addEventListener("click", (e) =>{
@@ -191,8 +195,8 @@ function updateCamera(){
     camera.x = player.x - offsetX;
     camera.y = player.y - offsetY;
 
-    camera.x = Math.max(0, Math.min(camera.x, tileMap[0].length * 50 - canvas.width));
-    camera.y = Math.max(0, Math.min(camera.y, tileMap.length * 50 - canvas.height));
+    camera.x = Math.max(0, Math.min(camera.x, map1[0].length * 50 - canvas.width));
+    camera.y = Math.max(0, Math.min(camera.y, map1.length * 50 - canvas.height));
 
 }
 
@@ -233,6 +237,8 @@ function drawGrid(){
         }
     }
 }
+
+
 //console.log("hello again");
 function gameLoop(){
     //console.log("Gameloop started");
@@ -240,22 +246,16 @@ function gameLoop(){
 
     // Player movement
     if(canMove){
-        if(keys["ArrowUp"] && !jumped){ 
+        if(keys["ArrowUp"] && onGround){ 
             if(onJumpPad){
-                velocityY = -25;
+                velocityY = -20;
             }else{
                 velocityY = -15;
             }
             onJumpPad = false;
-            jumped = true;
-            inAir = true; 
-            
+            onGround = false;
         }  
     }         
-    
-    // Bring the player back down
-    velocityY += gravity; // with gravity the 
-    player.y += velocityY;
     updateCamera();
 
     if(screenActive.mainMenu){
@@ -321,75 +321,76 @@ function gameLoop(){
         //setTimeout(changeState, 3000);
     }
     if(screenActive.level1Active){
+        
+
         //console.log("Level 1 active");
         // Calculate the total width of the game world (not the screen)
-        // tileMap[0].length = number of columns (tiles) in the map
+        // map1[0].length = number of columns (tiles) in the map
         // Each tile is 50 pixels wide
         // So: total world width = number of tiles * tile size
-        const worldWidth = tileMap[0].length * 50;
+        const worldWidth = map1[0].length * tileSize;
 
         // Check if the right arrow key is being pressed
         // AND make sure the player does NOT move past the right edge of the world
         // player.x + player.width = the player's RIGHT side
         // We compare that to worldWidth to prevent going off the map
-        if (keys["ArrowRight"] && player.x + player.width < worldWidth && canMove) {
-            // Move the player to the right by 2 pixels per frame
-            player.x += 2;
+        if (keys["ArrowRight"] && player.x + player.width < worldWidth && canMove) {        
+            player.x += player.speed;
         }else if(keys["ArrowLeft"] && player.x >= 0 && canMove) {
-            player.x -=2;
+            player.x -= player.speed;
         }else{
             player.x = pOldX;
         }              
 
+        velocityY += gravity; // The speed at which the player falls increases because of gravity constantly increasing the value of velocity
+        player.y += velocityY; // apply the new speed each frame so the player gradually falls faster
+        
         // Draw tiles
-        for(let row = 0; row < tileMap.length; row++){
-            for(let col = 0; col < tileMap[row].length; col++){
-                const tileIndex = tileMap[row][col]; // Get number from tilemap
+        for(let row = 0; row < map1.length; row++){
+            for(let col = 0; col < map1[row].length; col++){
+                const tileIndex = map1[row][col]; // Get number from map1
                 const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
                 if(!tileImage.complete) continue;
-                const screenX = col * 50 - camera.x;
-                const screenY = row * 50 - camera.y;
+                const screenX = col * tileSize - camera.x;
+                const screenY = row * tileSize - camera.y;
                 
-                draw.drawImage(tileImage, screenX, screenY, 50, 50);
+                draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
                 
             }   
         }
 
         // Check collisions with tiles
-        for(let row = 0; row < tileMap.length; row++){
-            for(let col = 0; col < tileMap[row].length; col++){
+        for(let row = 0; row < map1.length; row++){
+            for(let col = 0; col < map1[row].length; col++){
                 let tileX = col * 50;
                 let tileY = row * 50;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(tileMap[row][col] == 4){
-                    if(player.x < tileX + 50 &&
-                    player.x + player.width > tileX &&
-                    player.y < tileY + 50 &&
-                    player.y + player.height > tileY){
-
-                        // Landing on top
-                        if(pOldY + player.height <= tileY){
+                if(map1[row][col] == 4){
+                    if(player.x + player.fromLeft < tileX + tileSize && player.x + player.width - player.fromRight > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
+                        // Collision with top of tile
+                        if(pOldY + player.height <= tileY  && player.y + player.height >= tileY){
                             player.y = tileY - player.height;
                             velocityY = 0;
-                            inAir = false;
+                            onGround = true;     
                         }
-
                         // Hitting head
-                        else if(pOldY >= tileY + 50){
-                            player.y = tileY + 50;
+                        if(pOldY >= tileY + tileSize && player.y <= tileY + tileSize){
+                            player.y = tileY + tileSize;
                             velocityY = 0;
                         }
 
                         // Side collisions
-                        else if(pOldX + player.width <= tileX){
-                            player.x = tileX - player.width;
-                        }
-                        else if(pOldX >= tileX + 50){
-                            player.x = tileX + 50;
+                        if(player.y + player.height > tileY && player.y < tileY + tileSize){
+                            if(pOldX + player.width <= tileX && player.x + player.width > tileX){
+                                player.x = tileX - player.width;
+                            }
+                            if(pOldX >= tileX + tileSize && player.x < tileX + tileSize){
+                                player.x = tileX + tileSize;
+                            }
                         }
                     }
                 }
-                if(tileMap[row][col] == 5){
+                if(map1[row][col] == 5){
                     // Once the player starts falling they can no longer move
                     if(player.y+50 > tileY+1){
                         canMove = false;
@@ -397,20 +398,20 @@ function gameLoop(){
                         canMove = true;
                     }
                     // Wont trigger until player character has gone down the hole
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY + 50){                                     
+                    if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY + tileSize){                                     
                         screenActive.died = true;
                         screenActive.level1Active = false;                          
                     }
                 }   
-                if(tileMap[row][col] == 6){                    
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
+                if(map1[row][col] == 6){                    
+                    if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
                         //console.log("On jump pad");
                         player.x = pOldX;      
                         onJumpPad = true;             
                     }
                 }
-                if(tileMap[row][col] == 7 || tileMap[row][col] == 8){
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
+                if(map1[row][col] == 7 || map1[row][col] == 8){
+                    if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
                         level1Complete = true;                              
                     }
                 }
@@ -418,7 +419,7 @@ function gameLoop(){
         }
         
         // The ogre inside the 50x50 tile is 13-37 wide
-        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + 50 && player.y + player.height > ogre.y){           
+        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + tileSize && player.y + player.height > ogre.y){           
             screenActive.died = true;  
             screenActive.level1Active = false;                          
         }
@@ -442,10 +443,12 @@ function gameLoop(){
     }
 
     if(screenActive.level2Active){
-        draw.fillStyle = "yellow";
-        draw.fillRect(0, 0, canvas.width, canvas.height);
+        velocityY += gravity; // The speed at which the player falls increases because of gravity constantly increasing the value of velocity
+        player.y += velocityY;
 
-        const worldWidth = map2[0].length * 50;
+        onGround = false;
+
+        const worldWidth = map2[0].length * tileSize;
 
         // Check if the right arrow key is being pressed
         // AND make sure the player does NOT move past the right edge of the world
@@ -459,76 +462,71 @@ function gameLoop(){
         }else{
             player.x = pOldX;
         }
-
+        
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){
-                const tileIndex = map2[row][col]; // Get number from tilemap
-                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
-                const screenX = col * 50 - camera.x;
-                const screenY = row * 50 - camera.y;
-                
-                draw.drawImage(tileImage, screenX, screenY, 50, 50);
-            }   
-        }
-
-        for(let row = 0; row < map2.length; row++){
-            for(let col = 0; col < map2[row].length; col++){
-                let tileX = col * 50;
-                let tileY = row * 50;
+                let tileX = col * tileSize;
+                let tileY = row * tileSize;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(tileMap[row][col] == 4){
-                    if(player.x < tileX + 50 &&
-                    player.x + player.width > tileX &&
-                    player.y < tileY + 50 &&
-                    player.y + player.height > tileY){
-
-                        // Landing on top
-                        if(pOldY + player.height <= tileY){
+                if(map2[row][col] == 4){
+                    if(player.x + player.fromLeft < tileX + tileSize && player.x + player.width - player.fromRight > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
+                        // Collision with top of tile
+                        if(pOldY + player.height <= tileY  && player.y + player.height >= tileY){
                             player.y = tileY - player.height;
                             velocityY = 0;
-                            inAir = false;
+                            onGround = true;     
                         }
-
                         // Hitting head
-                        else if(pOldY >= tileY + 50){
-                            player.y = tileY + 50;
+                        if(pOldY >= tileY + tileSize && player.y <= tileY + tileSize){
+                            player.y = tileY + tileSize;
                             velocityY = 0;
                         }
 
                         // Side collisions
-                        else if(pOldX + player.width <= tileX){
-                            player.x = tileX - player.width;
-                        }
-                        else if(pOldX >= tileX + 50){
-                            player.x = tileX + 50;
+                        if(player.y + player.height > tileY && player.y < tileY + tileSize){
+                            if(pOldX + player.width <= tileX && player.x + player.width > tileX){
+                                player.x = tileX - player.width;
+                            }
+                            if(pOldX >= tileX + tileSize && player.x < tileX + tileSize){
+                                player.x = tileX + tileSize;
+                            }
                         }
                     }
                 }
                 if(map2[row][col] == 5){
                     // Once the player starts falling they can no longer move
-                    if(player.y+50 > tileY+1){
+                    if(player.y + tileSize > tileY+1){
                         canMove = false;
                     }else{
                         canMove = true;
                     }
                     // Wont trigger until player character has gone down the hole
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY + 50){                                     
+                    if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY + tileSize){                                     
                         screenActive.died = true;
                         screenActive.level1Active = false;                          
                     }
                 }
-                if(map2[row][col] == 6 ){
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        //level1Complete = true;                              
-                    }
-                }
-                if(map2[row][col] == 7){                    
-                    if(player.x < tileX + 50 && player.x + player.width > tileX && player.y < tileY + 50 && player.y + player.height > tileY){
-                        onJumpPad = true;             
+                if(map2[row][col] == 6){                    
+                    if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
+                        onJumpPad = true;   
+                        //console.log("On jump pad");          
                     }
                 }
             }
         }
+        
+
+        for(let row = 0; row < map2.length; row++){
+            for(let col = 0; col < map2[row].length; col++){
+                const tileIndex = map2[row][col]; // Get number from map1
+                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
+                const screenX = col * tileSize - camera.x;
+                const screenY = row * tileSize - camera.y;
+                
+                draw.drawImage(tileImage, screenX, screenY, 50, 50);
+            }   
+        }
+        
         // Draw the enemies
         ogre.x = 200;
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
@@ -536,9 +534,10 @@ function gameLoop(){
         draw.drawImage(enemyImages[1], ogre.x - camera.x, ogre.y - camera.y);
         ogre.x = 950;
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
-        
-        
+         
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
+        //draw.fillRect(player.x - camera.x, player.y - camera.y, 40, 40);
+        
     }
     //drawGrid();
     // Redraw frames
