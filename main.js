@@ -55,7 +55,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: false, settings: false, died: false, level1Active: true, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
+let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
 
 let player = { x: 50, y: 500, width: 50, height: 50, speed: 3, fromLeft: 14, fromRight: 14, fromTop: 8};
 let ogre = { x: 600, y: 500};
@@ -63,8 +63,17 @@ let vampire = {x: 1350, y: 500};
 let ogre2 = { x: 4000, y: 500};
 let vampire2 = {x: 4500, y: 500};
 
-let npcInitialMove = {ogre1MoveLeft: true, ogre1MoveRight: false, vampire1MoveLeft: true, vampire1MoveRight: false,
-                ogre2MoveLeft: true, ogre2MoveRight: false, vampire2MoveLeft: true, vampire2MoveRight: false
+let ogre3 = { x: 1800, y: 300};
+let vampire3 = {x: 600, y: 500};
+
+let ogre4 = { x: 2500, y: 500};
+let vampire4 = {x: 1500, y: 500};
+
+
+let npcInitialMove = {  ogre1MoveLeft: true, ogre1MoveRight: false, vampire1MoveLeft: true, vampire1MoveRight: false,
+                        ogre2MoveLeft: true, ogre2MoveRight: false, vampire2MoveLeft: true, vampire2MoveRight: false,
+                        ogre3MoveLeft: true, ogre3MoveRight: false, vampire3MoveLeft: true, vampire3MoveRight: false,
+                        ogre4MoveLeft: true, ogre4MoveRight: false, vampire4MoveLeft: true, vampire4MoveRight: false,
 };
 
 let keys = {};
@@ -234,63 +243,124 @@ function drawGrid(){
     }
 }
 
-function changeNPCDirection(){
-    if(npcInitialMove.ogre1MoveLeft){
-        ogre.x -= 1;
-        if(ogre.x == 450){
-            npcInitialMove.ogre1MoveRight = true;
-            npcInitialMove.ogre1MoveLeft = false;
+function changeNPCDirection(level){
+    if(level == 1){
+        if(npcInitialMove.ogre1MoveLeft){
+            ogre.x -= 1;
+            if(ogre.x == 450){
+                npcInitialMove.ogre1MoveRight = true;
+                npcInitialMove.ogre1MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.ogre1MoveRight){
+            ogre.x += 1;
+            if(ogre.x == 750){
+                npcInitialMove.ogre1MoveLeft = true;
+                npcInitialMove.ogre1MoveRight = false;
+            }
         }
-        
-    }else if(npcInitialMove.ogre1MoveRight){
-        ogre.x += 1;
-        if(ogre.x == 750){
-            npcInitialMove.ogre1MoveLeft = true;
-            npcInitialMove.ogre1MoveRight = false;
-        }
-    }
 
-    if(npcInitialMove.ogre2MoveLeft){
-        ogre2.x -= 1;
-        if(ogre2.x == 3950){
-            npcInitialMove.ogre2MoveRight = true;
-            npcInitialMove.ogre2MoveLeft = false;
+        if(npcInitialMove.ogre2MoveLeft){
+            ogre2.x -= 1;
+            if(ogre2.x == 3950){
+                npcInitialMove.ogre2MoveRight = true;
+                npcInitialMove.ogre2MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.ogre2MoveRight){
+            ogre2.x += 1;
+            if(ogre2.x == 4100){
+                npcInitialMove.ogre2MoveLeft = true;
+                npcInitialMove.ogre2MoveRight = false;
+            }
         }
-        
-    }else if(npcInitialMove.ogre2MoveRight){
-        ogre2.x += 1;
-        if(ogre2.x == 4100){
-            npcInitialMove.ogre2MoveLeft = true;
-            npcInitialMove.ogre2MoveRight = false;
-        }
-    }
 
-    if(npcInitialMove.vampire1MoveLeft){
-        vampire.x -= 1;
-        if(vampire.x == 1250){
-            npcInitialMove.vampire1MoveRight = true;
-            npcInitialMove.vampire1MoveLeft = false;
+        if(npcInitialMove.vampire1MoveLeft){
+            vampire.x -= 1;
+            if(vampire.x == 1250){
+                npcInitialMove.vampire1MoveRight = true;
+                npcInitialMove.vampire1MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.vampire1MoveRight){
+            vampire.x += 1;
+            if(vampire.x == 1550){
+                npcInitialMove.vampire1MoveLeft = true;
+                npcInitialMove.vampire1MoveRight = false;
+            }
         }
-        
-    }else if(npcInitialMove.vampire1MoveRight){
-        vampire.x += 1;
-        if(vampire.x == 1550){
-            npcInitialMove.vampire1MoveLeft = true;
-            npcInitialMove.vampire1MoveRight = false;
+        if(npcInitialMove.vampire2MoveLeft){
+            vampire2.x -= 1;
+            if(vampire2.x == 4450){
+                npcInitialMove.vampire2MoveRight = true;
+                npcInitialMove.vampire2MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.vampire2MoveRight){
+            vampire2.x += 1;
+            if(vampire2.x == 4550){
+                npcInitialMove.vampire2MoveLeft = true;
+                npcInitialMove.vampire2MoveRight = false;
+            }
         }
-    }
-    if(npcInitialMove.vampire2MoveLeft){
-        vampire2.x -= 1;
-        if(vampire2.x == 4450){
-            npcInitialMove.vampire2MoveRight = true;
-            npcInitialMove.vampire2MoveLeft = false;
+    }else if(level == 2){
+        if(npcInitialMove.ogre3MoveLeft){
+            ogre3.x -= 1;
+            if(ogre3.x == 1500){
+                npcInitialMove.ogre3MoveRight = true;
+                npcInitialMove.ogre3MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.ogre3MoveRight){
+            ogre3.x += 1;
+            if(ogre3.x == 1900){
+                npcInitialMove.ogre3MoveLeft = true;
+                npcInitialMove.ogre3MoveRight = false;
+            }
         }
-        
-    }else if(npcInitialMove.vampire2MoveRight){
-        vampire2.x += 1;
-        if(vampire2.x == 4550){
-            npcInitialMove.vampire2MoveLeft = true;
-            npcInitialMove.vampire2MoveRight = false;
+
+        if(npcInitialMove.ogre4MoveLeft){
+            ogre4.x -= 1;
+            if(ogre4.x == 2450){
+                npcInitialMove.ogre4MoveRight = true;
+                npcInitialMove.ogre4MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.ogre4MoveRight){
+            ogre4.x += 1;
+            if(ogre4.x == 2700){
+                npcInitialMove.ogre4MoveLeft = true;
+                npcInitialMove.ogre4MoveRight = false;
+            }
+        }
+
+        if(npcInitialMove.vampire3MoveLeft){
+            vampire3.x -= 1;
+            if(vampire3.x == 500){
+                npcInitialMove.vampire3MoveRight = true;
+                npcInitialMove.vampire3MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.vampire3MoveRight){
+            vampire3.x += 1;
+            if(vampire3.x == 750){
+                npcInitialMove.vampire3MoveLeft = true;
+                npcInitialMove.vampire3MoveRight = false;
+            }
+        }
+        if(npcInitialMove.vampire4MoveLeft){
+            vampire4.x -= 1;
+            if(vampire4.x == 1300){
+                npcInitialMove.vampire4MoveRight = true;
+                npcInitialMove.vampire4MoveLeft = false;
+            }
+            
+        }else if(npcInitialMove.vampire4MoveRight){
+            vampire4.x += 1;
+            if(vampire4.x == 1550){
+                npcInitialMove.vampire4MoveLeft = true;
+                npcInitialMove.vampire4MoveRight = false;
+            }
         }
     }
 }
@@ -480,7 +550,7 @@ function gameLoop(){
             screenActive.level1Active = false;                          
         }
 
-        changeNPCDirection();
+        changeNPCDirection(1);
 
         // Enemy
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
@@ -511,13 +581,7 @@ function gameLoop(){
         player.y += velocityY;
 
         onGround = false;
-
         const worldWidth = map2[0].length * tileSize;
-
-        // Check if the right arrow key is being pressed
-        // AND make sure the player does NOT move past the right edge of the world
-        // player.x + player.width = the player's RIGHT side
-        // We compare that to worldWidth to prevent going off the map
         if (keys["ArrowRight"] && player.x + player.width < worldWidth && canMove) {
             // Move the player to the right by 2 pixels per frame
             player.x += 2;
@@ -526,7 +590,7 @@ function gameLoop(){
         }else{
             player.x = pOldX;
         }
-        
+        // Tile collisions
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){
                 let tileX = col * tileSize;
@@ -567,7 +631,7 @@ function gameLoop(){
                     // Wont trigger until player character has gone down the hole
                     if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY + tileSize){                                     
                         screenActive.died = true;
-                        screenActive.level1Active = false;                          
+                        screenActive.level2Active = false;                          
                     }
                 }
                 if(map2[row][col] == 6){                    
@@ -578,8 +642,6 @@ function gameLoop(){
                 }
             }
         }
-        
-
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){
                 const tileIndex = map2[row][col]; // Get number from map1
@@ -591,13 +653,22 @@ function gameLoop(){
             }   
         }
         
+        if(player.x < ogre3.x + 37 && player.x + player.width > ogre3.x+13 && player.y < ogre3.y + tileSize && player.y + player.height > ogre3.y ||
+            player.x < vampire3.x + 37 && player.x + player.width > vampire3.x+13 && player.y < vampire3.y + tileSize && player.y + player.height > vampire3.y ||
+            player.x < ogre4.x + 37 && player.x + player.width > ogre4.x+13 && player.y < ogre4.y + tileSize && player.y + player.height > ogre4.y ||
+            player.x < vampire4.x + 37 && player.x + player.width > vampire4.x+13 && player.y < vampire4.y + tileSize && player.y + player.height > vampire4.y){           
+            
+            screenActive.died = true;  
+            screenActive.level2Active = false;                          
+        }
+
+        changeNPCDirection(2);
+
         // Draw the enemies
-        ogre.x = 200;
-        draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
-        ogre.x = 600;
-        draw.drawImage(enemyImages[1], ogre.x - camera.x, ogre.y - camera.y);
-        ogre.x = 950;
-        draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
+        draw.drawImage(enemyImages[0], ogre3.x - camera.x, ogre3.y - camera.y);
+        draw.drawImage(enemyImages[1], vampire3.x - camera.x, vampire3.y - camera.y);
+        draw.drawImage(enemyImages[0], ogre4.x - camera.x, ogre4.y - camera.y);
+        draw.drawImage(enemyImages[1], vampire4.x - camera.x, vampire4.y - camera.y);
          
         draw.drawImage(fPlayerImage, player.x - camera.x, player.y - camera.y);
         //draw.fillRect(player.x - camera.x, player.y - camera.y, 40, 40);
