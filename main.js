@@ -55,18 +55,21 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, level1Active: false, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
+let screenActive = {mainMenu: false, settings: false, died: false, level1Active: true, level2Active: false, level3Active: false, level4Active: true, level5Active: false};
 
 let player = { x: 50, y: 500, width: 50, height: 50, speed: 3, fromLeft: 14, fromRight: 14, fromTop: 8};
 let ogre = { x: 600, y: 500};
-let vampire = {x: 300, y: 500};
+let vampire = {x: 1350, y: 500};
+let ogre2 = { x: 4000, y: 500};
+let vampire2 = {x: 4500, y: 500};
+
+let npcInitialMove = {ogre1MoveLeft: true, ogre1MoveRight: false, vampire1MoveLeft: true, vampire1MoveRight: false,
+                ogre2MoveLeft: true, ogre2MoveRight: false, vampire2MoveLeft: true, vampire2MoveRight: false
+};
 
 let keys = {};
 document.addEventListener("keydown", (e)=>{keys[e.key]=true;});
-document.addEventListener("keyup", (e)=>{keys[e.key]=false;
-                            if(e.key == "ArrowUp"){
-                                //onGround = false; // Resets value when key is released
-                            }});
+document.addEventListener("keyup", (e)=>{keys[e.key]=false;});
 
 canvas.addEventListener("click", (e) =>{
     const rect = canvas.getBoundingClientRect();
@@ -200,13 +203,6 @@ function updateCamera(){
 
 }
 
-function changeState(){
-    screenActive.died = false;
-    screenActive.level1Active = true;
-    player.x = 50;
-    player.y = 500;
-}
-
 function changeLevel(previousLevel){
     if(previousLevel == 1){
         screenActive.level1Active = false;
@@ -238,6 +234,66 @@ function drawGrid(){
     }
 }
 
+function changeNPCDirection(){
+    if(npcInitialMove.ogre1MoveLeft){
+        ogre.x -= 1;
+        if(ogre.x == 450){
+            npcInitialMove.ogre1MoveRight = true;
+            npcInitialMove.ogre1MoveLeft = false;
+        }
+        
+    }else if(npcInitialMove.ogre1MoveRight){
+        ogre.x += 1;
+        if(ogre.x == 750){
+            npcInitialMove.ogre1MoveLeft = true;
+            npcInitialMove.ogre1MoveRight = false;
+        }
+    }
+
+    if(npcInitialMove.ogre2MoveLeft){
+        ogre2.x -= 1;
+        if(ogre2.x == 3950){
+            npcInitialMove.ogre2MoveRight = true;
+            npcInitialMove.ogre2MoveLeft = false;
+        }
+        
+    }else if(npcInitialMove.ogre2MoveRight){
+        ogre2.x += 1;
+        if(ogre2.x == 4100){
+            npcInitialMove.ogre2MoveLeft = true;
+            npcInitialMove.ogre2MoveRight = false;
+        }
+    }
+
+    if(npcInitialMove.vampire1MoveLeft){
+        vampire.x -= 1;
+        if(vampire.x == 1250){
+            npcInitialMove.vampire1MoveRight = true;
+            npcInitialMove.vampire1MoveLeft = false;
+        }
+        
+    }else if(npcInitialMove.vampire1MoveRight){
+        vampire.x += 1;
+        if(vampire.x == 1550){
+            npcInitialMove.vampire1MoveLeft = true;
+            npcInitialMove.vampire1MoveRight = false;
+        }
+    }
+    if(npcInitialMove.vampire2MoveLeft){
+        vampire2.x -= 1;
+        if(vampire2.x == 4450){
+            npcInitialMove.vampire2MoveRight = true;
+            npcInitialMove.vampire2MoveLeft = false;
+        }
+        
+    }else if(npcInitialMove.vampire2MoveRight){
+        vampire2.x += 1;
+        if(vampire2.x == 4550){
+            npcInitialMove.vampire2MoveLeft = true;
+            npcInitialMove.vampire2MoveRight = false;
+        }
+    }
+}
 
 //console.log("hello again");
 function gameLoop(){
@@ -279,7 +335,7 @@ function gameLoop(){
         draw.fillStyle = "white";
         draw.font = "35px Arial";
         draw.fillText("START", startButton.x+20, startButton.y+38);                 
-        draw.fillText("SETTING", settingButton.x, settingButton.y+38);         
+        draw.fillText("SETTING", settingButton.x, settingButton.y+38);  
     }
     if(screenActive.settings){
         
@@ -301,6 +357,7 @@ function gameLoop(){
     
     if(screenActive.died){
         diedScreenActive = true;
+        velocityY = 0;
         draw.fillStyle = "black";
         draw.fillRect(0,0,canvas.width, canvas.height);
 
@@ -321,8 +378,6 @@ function gameLoop(){
         //setTimeout(changeState, 3000);
     }
     if(screenActive.level1Active){
-        
-
         //console.log("Level 1 active");
         // Calculate the total width of the game world (not the screen)
         // map1[0].length = number of columns (tiles) in the map
@@ -406,7 +461,7 @@ function gameLoop(){
                 if(map1[row][col] == 6){                    
                     if(player.x < tileX + tileSize && player.x + player.width > tileX && player.y < tileY + tileSize && player.y + player.height > tileY){
                         //console.log("On jump pad");
-                        player.x = pOldX;      
+                        //player.x = pOldX;      
                         onJumpPad = true;             
                     }
                 }
@@ -419,12 +474,21 @@ function gameLoop(){
         }
         
         // The ogre inside the 50x50 tile is 13-37 wide
-        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + tileSize && player.y + player.height > ogre.y){           
+        if(player.x < ogre.x + 37 && player.x + player.width > ogre.x+13 && player.y < ogre.y + tileSize && player.y + player.height > ogre.y ||
+            player.x < vampire.x + 37 && player.x + player.width > vampire.x+13 && player.y < vampire.y + tileSize && player.y + player.height > vampire.y){           
             screenActive.died = true;  
             screenActive.level1Active = false;                          
         }
+
+        changeNPCDirection();
+
         // Enemy
         draw.drawImage(enemyImages[0], ogre.x - camera.x, ogre.y - camera.y);
+        draw.drawImage(enemyImages[1], vampire.x - camera.x, vampire.y - camera.y);
+
+        draw.drawImage(enemyImages[0], ogre2.x - camera.x, ogre.y - camera.y);
+        draw.drawImage(enemyImages[1], vampire2.x - camera.x, vampire.y - camera.y);
+
         // Player
         //draw.fillStyle = "black";
         //draw.fillRect(player.x - camera.x, player.y - camera.y, player.width, player.height);  
