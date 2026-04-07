@@ -54,13 +54,14 @@ let startMenuActive = true, diedScreenActive = false, settingActive = false;
 // Buttons
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
+let backButton = {x: canvas.width/2 - 75, y: 400, width: 150, height: 50};
 
 let volumeRect = {x: canvas.width/2 - 75, y: 140, width: 150, height: 50};
 let volumeBarOutline = {x: canvas.width/2 - 50, y: 200, width: 100, height: 50};
 let volumeBar = {x: canvas.width/2 - 50, y: 200, width: 50, height: 50};
-let volumeDown = {x: canvas.width/2 - 90, y: 210, width: 30, height: 30};
-let volumeUp = {x: canvas.width/2 + 60, y: 210, width: 30, height: 30};
-let muteButton = {x: canvas.width/2 - 75, y: 260, width: 150, height: 50};
+let volumeDown = {x: canvas.width/2 - 45, y: 255, width: 40, height: 40};
+let volumeUp = {x: canvas.width/2 + 5, y: 255, width: 40, height: 40};
+let muteButton = {x: canvas.width/2 - 75, y: 300, width: 150, height: 50};
 //console.log(volumeRect.x, volumeRect.x+150);
 
 let restartButton = { x: 205, y: 275, width: 170, height: 50};
@@ -80,7 +81,7 @@ let ogre3 = { x: 1800, y: 300};
 let vampire3 = {x: 600, y: 500};
 let ogre4 = { x: 2500, y: 500};
 let vampire4 = {x: 1500, y: 500};
-
+let jumped = false;
 
 let npcInitialMove = {  ogre1MoveLeft: true, ogre1MoveRight: false, vampire1MoveLeft: true, vampire1MoveRight: false,
                         ogre2MoveLeft: true, ogre2MoveRight: false, vampire2MoveLeft: true, vampire2MoveRight: false,
@@ -104,7 +105,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("keyup", (e) => {
     if(e.key == "ArrowLeft") keys.left = false;
     if(e.key == "ArrowRight") keys.right = false;
-    if(e.key == "ArrowUp") keys.jump = false;
+    if(e.key == "ArrowUp") keys.jump = false; jumped = false; // jumped = player can only jump again if they let go of the key
 });
 
 // Mobile buttons
@@ -149,6 +150,7 @@ canvas.addEventListener("click", (e) =>{
         if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
             screenActive.mainMenu = false;
             screenActive.settings = true;
+            settingActive = true;
             startMenuActive = false;
         }
     }
@@ -165,6 +167,7 @@ canvas.addEventListener("click", (e) =>{
             bgMusic.volume = volume;
         }
         if(mouseX >= volumeUp.x && mouseX <= volumeUp.x + volumeUp.width && mouseY >= volumeUp.y && mouseY <= volumeUp.y + volumeUp.height){                
+           
             volumeBar.width+=10;
             volume += 0.1;
             if(volumeBar.width >= 100){
@@ -176,7 +179,16 @@ canvas.addEventListener("click", (e) =>{
             bgMusic.volume = volume;                    
         }
         if(mouseX >= muteButton.x && mouseX <= muteButton.x + muteButton.width && mouseY >= muteButton.y && mouseY <= muteButton.y + muteButton.height){                   
-            bgMusic.muted = true;                  
+            volumeBar.width = 0;
+            volume = 0;
+            bgMusic.volume = volume;
+                             
+        }
+        if(mouseX >= backButton.x && mouseX <= backButton.x + backButton.width && mouseY >= backButton.y && mouseY <= backButton.y + backButton.height){                   
+            startMenuActive = true;
+            screenActive.mainMenu = true;
+            screenActive.settings = false;
+            settingActive = false;                  
         }
     }
     if(diedScreenActive){
@@ -372,12 +384,13 @@ function gameLoop(){
 
     // Player movement
     if(canMove){
-        if(keys.jump && onGround){ 
+        if(keys.jump && onGround && !jumped){ 
             if(onJumpPad){
                 velocityY = -20;
             }else{
                 velocityY = -15;
             }
+            jumped = true;
             onJumpPad = false;
             onGround = false;
         }  
@@ -426,11 +439,6 @@ function gameLoop(){
         draw.fillText("SETTING", settingButton.x, settingButton.y+38);  
     }
     if(screenActive.settings){
-        //bgMusic.play();
-        // Background color
-        //draw.fillStyle = "black";
-        //draw.fillRect(0,0,canvas.width, canvas.height);
-
         draw.drawImage(settingsBackground, 0, 0);
         // Draw the rectangles for the button
         draw.fillStyle = "red";
@@ -441,14 +449,17 @@ function gameLoop(){
         draw.fillRect(volumeBar.x, volumeBar.y, volumeBar.width, volumeBar.height);
         draw.fillRect(volumeDown.x, volumeDown.y, volumeDown.width, volumeDown.height);
         draw.fillRect(volumeUp.x, volumeUp.y, volumeUp.width, volumeUp.height);
+        draw.fillRect(backButton.x, backButton.y, backButton.width, backButton.height);
 
         // Draw the writing inside the buttons
         draw.fillStyle = "white";
         draw.font = "35px Arial";
         draw.fillText("Volume", volumeRect.x + 15, volumeRect.y + 38);                 
         draw.fillText("Mute", muteButton.x + 35, muteButton.y + 38);
-        draw.fillText("-", volumeDown.x + 9, volumeDown.y + 25);                 
-        draw.fillText("+", volumeUp.x + 5, volumeUp.y + 27);
+        draw.fillText("Back", backButton.x+35, backButton.y+38);
+        draw.font = "50px Arial";
+        draw.fillText("-", volumeDown.x + 10, volumeDown.y + 32);                 
+        draw.fillText("+", volumeUp.x + 5, volumeUp.y + 37);
         
     }
     
