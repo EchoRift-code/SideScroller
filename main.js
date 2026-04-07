@@ -1,6 +1,6 @@
 import {level1} from "./levels/level1.js";
 import {level2} from "./levels/level2.js";
-import {menuBackground, fPlayerImage, enemyImages, tiles} from "./loadImages.js";
+import {menuBackground, fPlayerImage, enemyImages, tiles, settingsBackground} from "./loadImages.js";
 let map1 = level1, map2 = level2;
 
 window.onerror = function(message, source, lineno, colno, error){
@@ -34,6 +34,11 @@ if(isMobile){
     document.querySelector(".controls").style.display = "flex";
 }
 
+let volume = 0.5;
+const bgMusic = new Audio("music/sources/alexgrohl-energetic-action-sport-500409.mp3");
+bgMusic.loop = true;
+bgMusic.volume = volume;
+
 let gravity = 0.8; // what changes the speed in how fast you fall each frame
 let velocityY = 0; // how fast your moving
 
@@ -44,12 +49,20 @@ let canMove = true, onJumpPad = false, onGround = false;
 let level1Complete = false;
 
 // what screen is active for the buttons to be usable
-let startMenuActive = true, diedScreenActive = false;
+let startMenuActive = true, diedScreenActive = false, settingActive = false;
 
 // Buttons
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
-let volumeButton = {x: canvas.width/2-50, y: 200, width: 150, height: 50}
+
+let volumeRect = {x: canvas.width/2 - 75, y: 140, width: 150, height: 50};
+let volumeBarOutline = {x: canvas.width/2 - 50, y: 200, width: 100, height: 50};
+let volumeBar = {x: canvas.width/2 - 50, y: 200, width: 50, height: 50};
+let volumeDown = {x: canvas.width/2 - 90, y: 210, width: 30, height: 30};
+let volumeUp = {x: canvas.width/2 + 60, y: 210, width: 30, height: 30};
+let muteButton = {x: canvas.width/2 - 75, y: 260, width: 150, height: 50};
+//console.log(volumeRect.x, volumeRect.x+150);
+
 let restartButton = { x: 205, y: 275, width: 170, height: 50};
 let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
@@ -65,7 +78,6 @@ let vampire2 = {x: 4500, y: 500};
 
 let ogre3 = { x: 1800, y: 300};
 let vampire3 = {x: 600, y: 500};
-
 let ogre4 = { x: 2500, y: 500};
 let vampire4 = {x: 1500, y: 500};
 
@@ -76,18 +88,58 @@ let npcInitialMove = {  ogre1MoveLeft: true, ogre1MoveRight: false, vampire1Move
                         ogre4MoveLeft: true, ogre4MoveRight: false, vampire4MoveLeft: true, vampire4MoveRight: false,
 };
 
-let keys = {};
-document.addEventListener("keydown", (e)=>{keys[e.key]=true;});
-document.addEventListener("keyup", (e)=>{keys[e.key]=false;});
+let keys = {
+    left: false,
+    right: false,
+    jump: false
+};
+
+// Keyboard input
+document.addEventListener("keydown", (e) => {
+    if(e.key == "ArrowLeft") keys.left = true;
+    if(e.key == "ArrowRight") keys.right = true;
+    if(e.key == "ArrowUp") keys.jump = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    if(e.key == "ArrowLeft") keys.left = false;
+    if(e.key == "ArrowRight") keys.right = false;
+    if(e.key == "ArrowUp") keys.jump = false;
+});
+
+// Mobile buttons
+function setupButtons(btn, keyName){
+    btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        keys[keyName] = true;
+    });
+    btn.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        keys[keyName] = false;
+    });
+    btn.addEventListener("mosuedown", (e) => {
+        e.preventDefault();
+        keys[keyName] = true;
+    });
+    btn.addEventListener("mouseup", (e) => {
+        e.preventDefault();
+        keys[keyName] = false;
+    });
+}
+
+setupButtons(leftBtn, "left");
+setupButtons(rightBtn, "right");
+setupButtons(jumpBtn, "jump");
 
 canvas.addEventListener("click", (e) =>{
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left; // X relative to canvas
     const mouseY = e.clientY - rect.top; // Y relative to canvas
     //console.log("Mouse clicked at:", mouseX, mouseY);
-
+    
     if(startMenuActive){
         if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
+            bgMusic.play().catch(err => console.log(err)); // catch prevents errors if autoplay is blocked
             player.x = 50;
             player.y = 500;
             screenActive.mainMenu = false;
@@ -98,6 +150,33 @@ canvas.addEventListener("click", (e) =>{
             screenActive.mainMenu = false;
             screenActive.settings = true;
             startMenuActive = false;
+        }
+    }
+    if(settingActive){   
+        if(mouseX >= volumeDown.x && mouseX <= volumeDown.x + volumeDown.width && mouseY >= volumeDown.y && mouseY <= volumeDown.y + volumeDown.height){
+            volumeBar.width-=10;
+            volume -= 0.1;
+            if(volumeBar.width <= 0){
+                volumeBar.width = 0;
+            }
+            if(volume <= 0){
+                volume = 0;
+            }
+            bgMusic.volume = volume;
+        }
+        if(mouseX >= volumeUp.x && mouseX <= volumeUp.x + volumeUp.width && mouseY >= volumeUp.y && mouseY <= volumeUp.y + volumeUp.height){                
+            volumeBar.width+=10;
+            volume += 0.1;
+            if(volumeBar.width >= 100){
+                volumeBar.width = 100;
+            }
+            if(volume >= 1){
+                volume = 1;
+            }
+            bgMusic.volume = volume;                    
+        }
+        if(mouseX >= muteButton.x && mouseX <= muteButton.x + muteButton.width && mouseY >= muteButton.y && mouseY <= muteButton.y + muteButton.height){                   
+            bgMusic.muted = true;                  
         }
     }
     if(diedScreenActive){
@@ -119,85 +198,6 @@ canvas.addEventListener("click", (e) =>{
     }
 });
 
-// Add keys for buttons so they can be clicked and touched with touchscreen
-if(jumpBtn){
-    jumpBtn.addEventListener("mousedown", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = true;
-    });
-    jumpBtn.addEventListener("mouseup", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = false;
-    });
-    jumpBtn.addEventListener("mouseleave", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = false;
-    });
-    jumpBtn.addEventListener("touchstart", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = true;
-    });
-    jumpBtn.addEventListener("touchend", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = false;
-    });
-    jumpBtn.addEventListener("touchcancel", e => {
-        e.preventDefault();
-        keys["ArrowUp"] = false;
-    });
-}
-if(leftBtn){
-    leftBtn.addEventListener("mousedown", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = true;
-    });
-    leftBtn.addEventListener("mouseup", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = false;
-    });
-    leftBtn.addEventListener("mouseleave", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = false;
-    });
-    leftBtn.addEventListener("touchstart", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = true;
-    });
-    leftBtn.addEventListener("touchend", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = false;
-    });
-    leftBtn.addEventListener("touchcancel", e => {
-        e.preventDefault();
-        keys["ArrowLeft"] = false;
-    });
-}
-if(rightBtn){
-    rightBtn.addEventListener("mousedown", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = true;
-    });
-    rightBtn.addEventListener("mouseup", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = false;
-    });
-    rightBtn.addEventListener("mouseleave", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = false;
-    });
-    rightBtn.addEventListener("touchstart", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = true;
-    });
-    rightBtn.addEventListener("touchend", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = false;
-    });
-    rightBtn.addEventListener("touchcancel", e => {
-        e.preventDefault();
-        keys["ArrowRight"] = false;
-    });
-}
 
 function updateCamera(){
     
@@ -372,7 +372,7 @@ function gameLoop(){
 
     // Player movement
     if(canMove){
-        if(keys["ArrowUp"] && onGround){ 
+        if(keys.jump && onGround){ 
             if(onJumpPad){
                 velocityY = -20;
             }else{
@@ -381,11 +381,29 @@ function gameLoop(){
             onJumpPad = false;
             onGround = false;
         }  
-    }         
+    }        
+    // Calculate the total width of the game world (not the screen)
+    // map1[0].length = number of columns (tiles) in the map
+    // Each tile is 50 pixels wide
+    // So: total world width = number of tiles * tile size
+    const worldWidth = map1[0].length * tileSize;
+
+    // Check if the right arrow key is being pressed
+    // AND make sure the player does NOT move past the right edge of the world
+    // player.x + player.width = the player's RIGHT side
+    // We compare that to worldWidth to prevent going off the map
+    if (keys.right && player.x + player.width < worldWidth && canMove) {        
+        player.x += player.speed;
+    }else if(keys.left && player.x >= 0 && canMove) {
+        player.x -= player.speed;
+    }else{
+        player.x = pOldX;
+    }               
     updateCamera();
 
     if(screenActive.mainMenu){
         //console.log("We in the menu");
+        
         startMenuActive = true; // Makes sure the buttons are only clickable if in this screen
         // Background color
         //draw.fillStyle = "black";
@@ -408,21 +426,30 @@ function gameLoop(){
         draw.fillText("SETTING", settingButton.x, settingButton.y+38);  
     }
     if(screenActive.settings){
-        
+        //bgMusic.play();
         // Background color
-        draw.fillStyle = "black";
-        draw.fillRect(0,0,canvas.width, canvas.height);
+        //draw.fillStyle = "black";
+        //draw.fillRect(0,0,canvas.width, canvas.height);
 
+        draw.drawImage(settingsBackground, 0, 0);
         // Draw the rectangles for the button
         draw.fillStyle = "red";
-        draw.fillRect(volumeButton.x, volumeButton.y, volumeButton.width, volumeButton.height);
-        draw.fillRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
-        
+        draw.fillRect(volumeRect.x, volumeRect.y, volumeRect.width, volumeRect.height);
+        draw.fillRect(muteButton.x, muteButton.y, muteButton.width, muteButton.height);
+        draw.strokeStyle = "blue";
+        draw.strokeRect(volumeBarOutline.x, volumeBarOutline.y, volumeBarOutline.width, volumeBarOutline.height);
+        draw.fillRect(volumeBar.x, volumeBar.y, volumeBar.width, volumeBar.height);
+        draw.fillRect(volumeDown.x, volumeDown.y, volumeDown.width, volumeDown.height);
+        draw.fillRect(volumeUp.x, volumeUp.y, volumeUp.width, volumeUp.height);
+
         // Draw the writing inside the buttons
         draw.fillStyle = "white";
         draw.font = "35px Arial";
-        draw.fillText("Volume", volumeButton.x+15, volumeButton.y+38);                 
-        draw.fillText("Mute", settingButton.x+35, settingButton.y+38); 
+        draw.fillText("Volume", volumeRect.x + 15, volumeRect.y + 38);                 
+        draw.fillText("Mute", muteButton.x + 35, muteButton.y + 38);
+        draw.fillText("-", volumeDown.x + 9, volumeDown.y + 25);                 
+        draw.fillText("+", volumeUp.x + 5, volumeUp.y + 27);
+        
     }
     
     if(screenActive.died){
@@ -448,25 +475,6 @@ function gameLoop(){
         //setTimeout(changeState, 3000);
     }
     if(screenActive.level1Active){
-        //console.log("Level 1 active");
-        // Calculate the total width of the game world (not the screen)
-        // map1[0].length = number of columns (tiles) in the map
-        // Each tile is 50 pixels wide
-        // So: total world width = number of tiles * tile size
-        const worldWidth = map1[0].length * tileSize;
-
-        // Check if the right arrow key is being pressed
-        // AND make sure the player does NOT move past the right edge of the world
-        // player.x + player.width = the player's RIGHT side
-        // We compare that to worldWidth to prevent going off the map
-        if (keys["ArrowRight"] && player.x + player.width < worldWidth && canMove) {        
-            player.x += player.speed;
-        }else if(keys["ArrowLeft"] && player.x >= 0 && canMove) {
-            player.x -= player.speed;
-        }else{
-            player.x = pOldX;
-        }              
-
         velocityY += gravity; // The speed at which the player falls increases because of gravity constantly increasing the value of velocity
         player.y += velocityY; // apply the new speed each frame so the player gradually falls faster
         
@@ -581,15 +589,7 @@ function gameLoop(){
         player.y += velocityY;
 
         onGround = false;
-        const worldWidth = map2[0].length * tileSize;
-        if (keys["ArrowRight"] && player.x + player.width < worldWidth && canMove) {
-            // Move the player to the right by 2 pixels per frame
-            player.x += 2;
-        }else if(keys["ArrowLeft"] && player.x >= 0 && canMove) {
-            player.x -=2;
-        }else{
-            player.x = pOldX;
-        }
+        
         // Tile collisions
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){

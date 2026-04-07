@@ -1,4 +1,4 @@
-export {fPlayerImage, enemyImages, tiles, menuBackground};
+export {fPlayerImage, enemyImages, tiles, menuBackground, settingsBackground};
 
 let enemyImages = [];
 let ogreImage = new Image(), vampireImage = new Image();
@@ -30,6 +30,12 @@ let menuBackground = new Image();
 menuBackground.src = "images/menuBackground.png";
 menuBackground.onload = () => {
     console.log("Loaded menu Background");
+};
+
+let settingsBackground = new Image();
+settingsBackground.src = "images/settingsBackground.png";
+settingsBackground.onload = () => {
+    console.log("Loaded setting background");
 };
 
 let tiles = [];
