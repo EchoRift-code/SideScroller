@@ -35,9 +35,21 @@ if(isMobile){
 }
 
 let volume = 0.5;
-const bgMusic = new Audio("music/sources/alexgrohl-energetic-action-sport-500409.mp3");
-bgMusic.loop = true;
-bgMusic.volume = volume;
+const level1Music = new Audio("music/sources/alexgrohl-energetic-action-sport-500409.mp3");
+const level2Music = new Audio("music/sources/denys_brodovskyi-tell-me-what-379638.mp3");
+const level3Music = new Audio("music/sources/alexgrohl-sad-soul-hip-hop-185750.mp3");
+const level4Music = new Audio("music/sources/monume-summer-509512.mp3");
+const level5Music = new Audio("music/sources/nastelbom-suspense-487702.mp3");
+level1Music.loop = true;
+level1Music.volume = volume;
+level2Music.loop = true;
+level2Music.volume = volume;
+level3Music.loop = true;
+level3Music.volume = volume;
+level4Music.loop = true;
+level4Music.volume = volume;
+level5Music.loop = true;
+level5Music.volume = volume;
 
 let gravity = 0.8; // what changes the speed in how fast you fall each frame
 let velocityY = 0; // how fast your moving
@@ -62,7 +74,7 @@ let volumeBar = {x: canvas.width/2 - 50, y: 200, width: 50, height: 50};
 let volumeDown = {x: canvas.width/2 - 45, y: 255, width: 40, height: 40};
 let volumeUp = {x: canvas.width/2 + 5, y: 255, width: 40, height: 40};
 let muteButton = {x: canvas.width/2 - 75, y: 300, width: 150, height: 50};
-//console.log(volumeRect.x, volumeRect.x+150);
+
 
 let restartButton = { x: 205, y: 275, width: 170, height: 50};
 let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
@@ -98,14 +110,14 @@ let keys = {
 // Keyboard input
 document.addEventListener("keydown", (e) => {
     if(e.key == "ArrowLeft") keys.left = true;
-    if(e.key == "ArrowRight") keys.right = true;
-    if(e.key == "ArrowUp") keys.jump = true;
+    else if(e.key == "ArrowRight") keys.right = true;
+    else if(e.key == "ArrowUp") keys.jump = true;
 });
 
 document.addEventListener("keyup", (e) => {
     if(e.key == "ArrowLeft") keys.left = false;
-    if(e.key == "ArrowRight") keys.right = false;
-    if(e.key == "ArrowUp") keys.jump = false; jumped = false; // jumped = player can only jump again if they let go of the key
+    else if(e.key == "ArrowRight") keys.right = false;
+    else if(e.key == "ArrowUp") keys.jump = false; jumped = false; // jumped = player can only jump again if they let go of the key
 });
 
 // Mobile buttons
@@ -140,7 +152,7 @@ canvas.addEventListener("click", (e) =>{
     
     if(startMenuActive){
         if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
-            bgMusic.play().catch(err => console.log(err)); // catch prevents errors if autoplay is blocked
+            level1Music.play().catch(err => console.log(err)); // catch prevents errors if autoplay is blocked
             player.x = 50;
             player.y = 500;
             screenActive.mainMenu = false;
@@ -164,7 +176,7 @@ canvas.addEventListener("click", (e) =>{
             if(volume <= 0){
                 volume = 0;
             }
-            bgMusic.volume = volume;
+            level1Music.volume = volume;
         }
         if(mouseX >= volumeUp.x && mouseX <= volumeUp.x + volumeUp.width && mouseY >= volumeUp.y && mouseY <= volumeUp.y + volumeUp.height){                
            
@@ -176,12 +188,12 @@ canvas.addEventListener("click", (e) =>{
             if(volume >= 1){
                 volume = 1;
             }
-            bgMusic.volume = volume;                    
+            level1Music.volume = volume;                    
         }
         if(mouseX >= muteButton.x && mouseX <= muteButton.x + muteButton.width && mouseY >= muteButton.y && mouseY <= muteButton.y + muteButton.height){                   
             volumeBar.width = 0;
             volume = 0;
-            bgMusic.volume = volume;
+            level1Music.volume = volume;
                              
         }
         if(mouseX >= backButton.x && mouseX <= backButton.x + backButton.width && mouseY >= backButton.y && mouseY <= backButton.y + backButton.height){                   
@@ -225,25 +237,32 @@ function updateCamera(){
 }
 
 function changeLevel(previousLevel){
+    player.x = 50;
+    player.y = 500;
     if(previousLevel == 1){
+        level1Music.pause();
+        level2Music.play().catch(err => console.log(err));
         screenActive.level1Active = false;
         screenActive.level2Active = true;
     }else if(previousLevel == 2){
+        level2Music.pause();
+        level3Music.play().catch(err => console.log(err));
         screenActive.level2Active = false;
         screenActive.level3Active = true;
     }else if(previousLevel == 3){
+        level3Music.pause();
+        level4Music.play().catch(err => console.log(err));
         screenActive.level3Active = false;
         screenActive.level4Active = true;
     }else if(previousLevel == 4){
+        level4Music.pause();
+        level5Music.play().catch(err => console.log(err));
         screenActive.level4Active = false;
         screenActive.level5Active = true;
     }else if(previousLevel == 5){
         screenActive.level5Active = false;
         //screenActive.level2Active = false;
     }
-    
-    player.x = 50;
-    player.y = 500;
 }
 
 function drawGrid(){
@@ -409,8 +428,6 @@ function gameLoop(){
         player.x += player.speed;
     }else if(keys.left && player.x >= 0 && canMove) {
         player.x -= player.speed;
-    }else{
-        player.x = pOldX;
     }               
     updateCamera();
 
