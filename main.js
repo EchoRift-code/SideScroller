@@ -129,6 +129,7 @@ function setupButtons(btn, keyName){
     btn.addEventListener("touchend", (e) => {
         e.preventDefault();
         keys[keyName] = false;
+        jumped = false;
     });
     btn.addEventListener("mosuedown", (e) => {
         e.preventDefault();
