@@ -305,6 +305,25 @@ canvas.addEventListener("click", (e) =>{
     }
 });
 
+// It checks if the page is hidden and pauses all active music
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        // The user left the app (Home screen or new tab)
+        level1Music.pause();
+        level2Music.pause();
+        level3Music.pause();
+    } else {
+        // The user came back - check which level is active to resume the right song
+        if (screenActive.level1Active) {
+            level1Music.play().catch(err => console.log("Audio resume blocked:", err));
+        } else if (screenActive.level2Active) {
+            level2Music.play().catch(err => console.log("Audio resume blocked:", err));
+        } else if (screenActive.level3Active) {
+            level3Music.play().catch(err => console.log("Audio resume blocked:", err));
+        }
+    }
+});
+
 function updateCamera(){
     const offsetX = 200;
     const offsetY = 200;
