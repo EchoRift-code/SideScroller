@@ -57,6 +57,11 @@
                 justify-content: center;
                 align-items: center;
                 
+                touch-action: none;
+                /*Prevents the phone from scrolling while user is playing*/
+                user-select: none;
+                /*Prevents the copy/paste menu from popping up on long press*/
+                -webkit-user-select: none;
             }
 
             /* Style all buttons globally */
