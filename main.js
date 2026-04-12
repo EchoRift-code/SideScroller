@@ -693,6 +693,10 @@ function resetLevels(){
 }
 let lastTime = 0;
 function gameLoop(timestamp){   
+    if (document.hidden) {
+        requestAnimationFrame(gameLoop);
+        return; // Stop the rest of the code from running
+    }
     let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
     //console.log(deltaTime);
