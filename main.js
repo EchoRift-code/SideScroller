@@ -180,24 +180,41 @@ document.addEventListener("keyup", (e) => {
     }
 });
 
-// Mobile buttons
+// Mobile buttons, anything changed in the above listeners needs to be  added here for mobile
 function setupButtons(btn, keyName){
     btn.addEventListener("touchstart", (e) => {
         e.preventDefault();
         keys[keyName] = true;
+
+        // --- ADD ANIMATION STATE HERE ---
+        if (keyName === "left") {
+            goingRight = false;
+            state = "walk";
+        } else if (keyName === "right") {
+            goingRight = true;
+            state = "walk";
+        }
     });
     btn.addEventListener("touchend", (e) => {
         e.preventDefault();
         keys[keyName] = false;
         jumped = false;
+
+        // --- RESET TO IDLE HERE ---
+        if (keyName === "left" || keyName === "right") {
+            state = "idle";
+        }
     });
-    btn.addEventListener("mosuedown", (e) => {
+    btn.addEventListener("mousedown", (e) => {
         e.preventDefault();
         keys[keyName] = true;
+        if (keyName === "left") { goingRight = false; state = "walk"; }
+        if (keyName === "right") { goingRight = true; state = "walk"; }
     });
     btn.addEventListener("mouseup", (e) => {
         e.preventDefault();
         keys[keyName] = false;
+        if (keyName === "left" || keyName === "right") state = "idle";
     });
 }
 
@@ -655,7 +672,11 @@ function resetLevels(){
     enemies = [];
     level1Music.play().catch(err => console.log(err));;
 }
-function gameLoop(){   
+let lastTime = 0;
+function gameLoop(timestamp){   
+    let deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+    //console.log(deltaTime);
     updateCamera(); 
     // Player movement
     if(canMove){
