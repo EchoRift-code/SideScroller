@@ -87,8 +87,8 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, 
-                level1Active: false, level2Active: false, level3Active: false, level4Active: false, level5Active: false};
+let screenActive = {mainMenu: false, settings: false, died: false, 
+                level1Active: false, level2Active: true, level3Active: false, level4Active: false, level5Active: false};
 let player = { x: 64, y: 512, width: 96, height: 84, speed: 3};
 let hitboxX = 0, hitboxY = 0;
 
@@ -709,15 +709,13 @@ function resetLevels(){
     enemies = [];
     level1Music.play().catch(err => console.log(err));;
 }
-let lastTime = 0;
-function gameLoop(timestamp){   
+
+function gameLoop(timestamp){  
     if (document.hidden) {
         requestAnimationFrame(gameLoop);
         return; // Stop the rest of the code from running
     }
-    let deltaTime = timestamp - lastTime;
-    lastTime = timestamp;
-    //console.log(deltaTime);
+    
     updateCamera(); 
     // Player movement
     if(canMove){
@@ -732,6 +730,7 @@ function gameLoop(timestamp){
             onJumpPad = false;
             onGround = false;
         }  
+        onJumpPad = false;
     }
     if (onGround && state === "jump") {
         state = keys.left || keys.right ? "walk" : "idle";
@@ -1015,7 +1014,7 @@ function gameLoop(timestamp){
                     console.warn(`Tile image missing for index: ${tileIndex}`);
                 }
     
-                draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
+                //draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
             }   
         }
         
@@ -1071,9 +1070,7 @@ function gameLoop(timestamp){
                         onJumpPad = true;
                         //console.log(onJumpPad);
                     }
-                    else{
-                        onJumpPad = false;
-                    }
+                    
                 }
             }
         }
