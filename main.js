@@ -307,15 +307,26 @@ canvas.addEventListener("click", (e) =>{
 
 // It checks if the page is hidden and pauses all active music
 function pauseAllAudio() {
-    level1Music.pause();
-    level2Music.pause();
-    level3Music.pause();
+    // Mute then Pause
+    [level1Music, level2Music, level3Music, level4Music, level5Music].forEach(track => {
+        track.volume = 0; 
+        track.pause();
+    });
 }
 
 function resumeCurrentAudio() {
-    if (screenActive.level1Active) level1Music.play().catch(() => {});
-    else if (screenActive.level2Active) level2Music.play().catch(() => {});
-    else if (screenActive.level3Active) level3Music.play().catch(() => {});
+    // Determine which track SHOULD be playing
+    let activeTrack = null;
+    if (screenActive.level1Active) activeTrack = level1Music;
+    else if (screenActive.level2Active) activeTrack = level2Music;
+    else if (screenActive.level3Active) activeTrack = level3Music;
+    else if (screenActive.level4Active) activeTrack = level4Music;
+    else if (screenActive.level5Active) activeTrack = level5Music;
+
+    if (activeTrack) {
+        activeTrack.volume = volume; // Restore the global volume variable
+        activeTrack.play().catch(err => console.log("Resume failed:", err));
+    }
 }
 
 // 1. Handles tab switching and home screen on most phones
