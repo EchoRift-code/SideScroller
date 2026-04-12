@@ -306,23 +306,30 @@ canvas.addEventListener("click", (e) =>{
 });
 
 // It checks if the page is hidden and pauses all active music
+function pauseAllAudio() {
+    level1Music.pause();
+    level2Music.pause();
+    level3Music.pause();
+}
+
+function resumeCurrentAudio() {
+    if (screenActive.level1Active) level1Music.play().catch(() => {});
+    else if (screenActive.level2Active) level2Music.play().catch(() => {});
+    else if (screenActive.level3Active) level3Music.play().catch(() => {});
+}
+
+// 1. Handles tab switching and home screen on most phones
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-        // The user left the app (Home screen or new tab)
-        level1Music.pause();
-        level2Music.pause();
-        level3Music.pause();
+        pauseAllAudio();
     } else {
-        // The user came back - check which level is active to resume the right song
-        if (screenActive.level1Active) {
-            level1Music.play().catch(err => console.log("Audio resume blocked:", err));
-        } else if (screenActive.level2Active) {
-            level2Music.play().catch(err => console.log("Audio resume blocked:", err));
-        } else if (screenActive.level3Active) {
-            level3Music.play().catch(err => console.log("Audio resume blocked:", err));
-        }
+        resumeCurrentAudio();
     }
 });
+
+// 2. Backup: Handles clicking out of the window or pulling down the notification bar
+window.addEventListener("blur", pauseAllAudio);
+window.addEventListener("focus", resumeCurrentAudio);
 
 function updateCamera(){
     const offsetX = 200;
