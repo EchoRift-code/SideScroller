@@ -647,10 +647,13 @@ function resetLevels(){
     canMove = true;
     diedScreenActive = false;
 
+    // Re-copy the original map so any 0's for the enemies are replaced with original value and they can be redrawn
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
 
+    // Clear the existing enemies so they dont double up
     enemies = [];
+    level1Music.play().catch(err => console.log(err));;
 }
 function gameLoop(){   
     updateCamera(); 
