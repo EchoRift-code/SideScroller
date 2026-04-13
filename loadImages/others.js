@@ -1,4 +1,4 @@
-export {menuBackground, settingsBackground, level1Door, cars, loadingScreenImg};
+export {menuBackground, settingsBackground, level1Door, level2Door};
 
 let menuBackground = new Image();
 menuBackground.src = "images/myImages/menuBackground.png";
@@ -16,16 +16,8 @@ level1Door.src = "images/myImages/door1.png";
 level1Door.onload = () => {
     console.log("Loaded level 1 door");
 };
-
-// level 3 cars
-let cars = [];
-let blackCar = new Image;
-blackCar.src = "images/AICreated/blackCar.png";
-
-cars.push(blackCar);
-
-let loadingScreenImg = new Image();
-loadingScreenImg.src = "images/OtherPeopleCreated/Player/level2/Goldie portrait_with frame 02.png";
-loadingScreenImg.onload = () => {
-    console.log("Loading screen is ready");
+let level2Door = new Image();
+level2Door.src = "images/myImages/door2.png";
+level2Door.onload = () => {
+    console.log("Loaded level 2 door");
 };

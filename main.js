@@ -1,13 +1,13 @@
 import {level1} from "./levels/level1.js";
 import {level2} from "./levels/level2.js";
 import { level3 } from "./levels/level3.js";
-import {menuBackground, cars, settingsBackground, level1Door, loadingScreenImg} from "./loadImages/others.js";
-import { tiles } from "./loadImages/loadTiles.js";
+import {menuBackground, settingsBackground, level1Door, level2Door} from "./loadImages/others.js";
+import { tiles, level3Tiles, dancingApe, level3Background } from "./loadImages/loadTiles.js";
 import { cyclopsImage, mushroomImage} from "./loadImages/loadEnemies.js";
 import { playerIdleLvl1, playerWalkLvl1, playerJumpLvl1, playerWalkLvl2 } from "./loadImages/loadPlayer.js";
 
 // Using spread operator [...] creates a shallow copy of the arrays
-let map1 = level1.map(row => [...row]), map2 = level2.map(row => [...row]);
+let map1 = level1.map(row => [...row]), map2 = level2.map(row => [...row]), map3 = level3.map(row => [...row]);
 
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
@@ -88,7 +88,7 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 let camera = { x : 0, y : 0};
 
 let screenActive = {mainMenu: false, settings: false, died: false, 
-                level1Active: false, level2Active: true, level3Active: false, level4Active: false, level5Active: false};
+                level1Active: false, level2Active: false, level3Active: true, level4Active: false, level5Active: false};
 let player = { x: 64, y: 512, width: 96, height: 84, speed: 3};
 let hitboxX = 0, hitboxY = 0;
 
@@ -112,6 +112,11 @@ let keys = {
 };
 let state = "idle";
 let goingRight = true;
+
+// Set up to try and make my own tilemap editor
+let editorMode = false; // Toggle this to 'true' when you want to build
+let selectedTile = 3;  // The ID of the car tile you want to "paint"
+
 // Keyboard input
 document.addEventListener("keydown", (e) => {
     if(e.key == "ArrowLeft") {
@@ -141,6 +146,44 @@ document.addEventListener("keydown", (e) => {
         keys.right = true;
         goingRight = true;
         state = "walk";
+    }
+    if (e.key === "p") { // Press 'P' to print
+        let output = "export const level3 = [\n";
+        level3.forEach(row => {
+            output += "  [" + row.join(", ") + "],\n";
+        });
+        output += "];";
+        
+        console.log(output);
+        alert("Level saved to Console! Press F12 to copy it.");
+    }
+    if(e.key == "0"){ // Background
+        selectedTile = 0;
+        console.log(selectedTile);
+    }else if(e.key == "1"){ // Tiles to walk on
+        selectedTile = 1;
+        console.log(selectedTile);
+    }else if(e.key == "2"){ // monster 1
+        selectedTile = 2;
+        console.log(selectedTile);
+    }else if(e.key == "3"){ // monster 2
+        selectedTile = 3;
+        console.log(selectedTile);
+    }else if(e.key == "4"){ // death fall
+        selectedTile = 4;
+        console.log(selectedTile);
+    }
+    else if(e.key == "5"){ // 
+        selectedTile = 5;
+        console.log(selectedTile);
+    }
+    else if(e.key == "6"){ // jumpad
+        selectedTile = 6;
+        console.log(selectedTile);
+    }
+    else if(e.key == "7"){ // random dancing monster
+        selectedTile = 7;
+        console.log(selectedTile);
     }
 });
 
@@ -222,85 +265,104 @@ setupButtons(leftBtn, "left");
 setupButtons(rightBtn, "right");
 setupButtons(jumpBtn, "jump");
 
+
 canvas.addEventListener("click", (e) =>{
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left; // X relative to canvas
-    const mouseY = e.clientY - rect.top; // Y relative to canvas
-    //console.log("X:", player.x, "Y:", player.y);
-    if(startMenuActive){
-        if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
-            level1Music.play().catch(err => console.log(err)); // catch prevents errors if autoplay is blocked
-            player.x = 64;
-            player.y = 512;
-            screenActive.mainMenu = false;
-            screenActive.level1Active = true;
-            startMenuActive = false;     
+    if(!editorMode){
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left; // X relative to canvas
+        const mouseY = e.clientY - rect.top; // Y relative to canvas
+        //console.log("X:", player.x, "Y:", player.y);
+        if(startMenuActive){
+            if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
+                level1Music.play().catch(err => console.log(err)); // catch prevents errors if autoplay is blocked
+                player.x = 64;
+                player.y = 512;
+                screenActive.mainMenu = false;
+                screenActive.level1Active = true;
+                startMenuActive = false;     
+            }
+            if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
+                screenActive.mainMenu = false;
+                screenActive.settings = true;
+                settingActive = true;
+                startMenuActive = false;
+            }
         }
-        if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
-            screenActive.mainMenu = false;
-            screenActive.settings = true;
-            settingActive = true;
-            startMenuActive = false;
-        }
-    }
-    if(settingActive){   
-        if(mouseX >= volumeDown.x && mouseX <= volumeDown.x + volumeDown.width && mouseY >= volumeDown.y && mouseY <= volumeDown.y + volumeDown.height){
-            volumeBar.width-=10;
-            volume -= 0.1;
-            if(volumeBar.width <= 0){
+        if(settingActive){   
+            if(mouseX >= volumeDown.x && mouseX <= volumeDown.x + volumeDown.width && mouseY >= volumeDown.y && mouseY <= volumeDown.y + volumeDown.height){
+                volumeBar.width-=10;
+                volume -= 0.1;
+                if(volumeBar.width <= 0){
+                    volumeBar.width = 0;
+                }
+                if(volume <= 0){
+                    volume = 0;
+                }
+                level1Music.volume = volume;
+            }
+            if(mouseX >= volumeUp.x && mouseX <= volumeUp.x + volumeUp.width && mouseY >= volumeUp.y && mouseY <= volumeUp.y + volumeUp.height){                
+            
+                volumeBar.width+=10;
+                volume += 0.1;
+                if(volumeBar.width >= 100){
+                    volumeBar.width = 100;
+                }
+                if(volume >= 1){
+                    volume = 1;
+                }
+                level1Music.volume = volume;                    
+            }
+            if(mouseX >= muteButton.x && mouseX <= muteButton.x + muteButton.width && mouseY >= muteButton.y && mouseY <= muteButton.y + muteButton.height){                   
                 volumeBar.width = 0;
-            }
-            if(volume <= 0){
                 volume = 0;
-            }
-            level1Music.volume = volume;
-        }
-        if(mouseX >= volumeUp.x && mouseX <= volumeUp.x + volumeUp.width && mouseY >= volumeUp.y && mouseY <= volumeUp.y + volumeUp.height){                
-           
-            volumeBar.width+=10;
-            volume += 0.1;
-            if(volumeBar.width >= 100){
-                volumeBar.width = 100;
-            }
-            if(volume >= 1){
-                volume = 1;
-            }
-            level1Music.volume = volume;                    
-        }
-        if(mouseX >= muteButton.x && mouseX <= muteButton.x + muteButton.width && mouseY >= muteButton.y && mouseY <= muteButton.y + muteButton.height){                   
-            volumeBar.width = 0;
-            volume = 0;
-            level1Music.volume = volume;
-                             
-        }
-        if(mouseX >= backButton.x && mouseX <= backButton.x + backButton.width && mouseY >= backButton.y && mouseY <= backButton.y + backButton.height){                   
-            startMenuActive = true;
-            screenActive.mainMenu = true;
-            screenActive.settings = false;
-            settingActive = false;                  
-        }
-    }
-    if(diedScreenActive){
-        if(mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width && mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height){
-            level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
-            level1Music.currentTime = 0; // Resets the music to the beginning
-            level2Music.pause(); // Pause it so it doesnt keep playing on the menu screen
-            level3Music.currentTime = 0; // Resets the music to the beginning
-            resets++;
-            console.log("resets:", resets);
-            screenActive.died = false;
-            screenActive.level1Active = true;
-            screenActive.level2Active = false;
-            diedScreenActive = false;
-            resetLevels();
-        }
-        if(mouseX >= mainMenuButton.x && mouseX <= mainMenuButton.x + mainMenuButton.width && mouseY >= mainMenuButton.y && mouseY <= mainMenuButton.y + mainMenuButton.height){                
-            level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
-            level1Music.currentTime = 0; // Resets the music to the beginning
-            screenActive.mainMenu = true; 
-            screenActive.died = false;
-            diedScreenActive = false;
+                level1Music.volume = volume;
                                 
+            }
+            if(mouseX >= backButton.x && mouseX <= backButton.x + backButton.width && mouseY >= backButton.y && mouseY <= backButton.y + backButton.height){                   
+                startMenuActive = true;
+                screenActive.mainMenu = true;
+                screenActive.settings = false;
+                settingActive = false;                  
+            }
+        }
+        if(diedScreenActive){
+            if(mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width && mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height){
+                level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level1Music.currentTime = 0; // Resets the music to the beginning
+                level2Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level3Music.currentTime = 0; // Resets the music to the beginning
+                resets++;
+                console.log("resets:", resets);
+                screenActive.died = false;
+                screenActive.level1Active = true;
+                screenActive.level2Active = false;
+                diedScreenActive = false;
+                resetLevels();
+            }
+            if(mouseX >= mainMenuButton.x && mouseX <= mainMenuButton.x + mainMenuButton.width && mouseY >= mainMenuButton.y && mouseY <= mainMenuButton.y + mainMenuButton.height){                
+                level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level1Music.currentTime = 0; // Resets the music to the beginning
+                screenActive.mainMenu = true; 
+                screenActive.died = false;
+                diedScreenActive = false;
+                                    
+            }
+        }
+    }else if(editorMode){
+        // --- EDITOR LOGIC ---
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Convert pixels to Grid Coordinates
+        // (We add camera.x so it knows where you are in the long level)
+        let col = Math.floor((mouseX + camera.x) / tileSize); 
+        let row = Math.floor(mouseY / tileSize);
+
+        // This updates the array in the browser's memory
+        if (level3[row] && col >= 0 && col < level3[row].length) {
+            level3[row][col] = selectedTile;
+            console.log(`Placed tile ${selectedTile} at row: ${row}, col: ${col}`);
         }
     }
 });
@@ -349,7 +411,26 @@ function updateCamera(){
     camera.x = player.x - offsetX;
     camera.y = player.y - offsetY;
 
-    let activeMap = screenActive.level1Active ? map1 : map2; // Add this line
+    let activeMap; // Create the empty variable first
+
+    if (screenActive.level1Active === true) {
+        activeMap = map1;
+    } 
+    else if (screenActive.level2Active === true) {
+        activeMap = map2;
+    } 
+    else if (screenActive.level3Active === true) {
+        activeMap = map3;
+    } 
+    else if (screenActive.level4Active === true) {
+        activeMap = map4;
+    } 
+    else if (screenActive.level5Active === true) {
+        activeMap = map5;
+    } 
+    else {
+        activeMap = map1; // This is your "Safety Fallback"
+    }
     
     camera.x = Math.max(0, Math.min(camera.x, activeMap[0].length * tileSize - canvas.width));
     camera.y = Math.max(0, Math.min(camera.y, activeMap.length * tileSize - canvas.height));
@@ -366,6 +447,7 @@ function changeLevel(previousLevel){
 
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
+    map3 = level3.map(row => [...row]);
 
     enemies = []; // Clears the array so it can be empty for next level
     levelLoaded = false;
@@ -397,14 +479,6 @@ function changeLevel(previousLevel){
     }
 }
 
-function drawGrid(){
-    for(let x = 0; x < 800; x ++){
-        for(let y = 0; y < 600; y++){
-            draw.fillRect(x*tileSize,y*tileSize, 50,2);
-            draw.fillRect(x*tileSize,y*tileSize, 2,50);
-        }
-    }
-}
 function updateNPC(npc, moveState, levelMap) {
     // 1. Calculate the tile position directly in front of the NPC
     // We check slightly ahead of the NPC's center
@@ -704,13 +778,28 @@ function resetLevels(){
     // Re-copy the original map so any 0's for the enemies are replaced with original value and they can be redrawn
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
+    map3 = level3.map(row => [...row]);
 
     // Clear the existing enemies so they dont double up
     enemies = [];
     level1Music.play().catch(err => console.log(err));;
 }
+let frameCounter = 0;
+let apeFrameSpeed = 30;
+let apeTotalFrames = 16;
+function dancingApeSprite(){
+    let currentFrame = Math.floor(frameCounter / apeFrameSpeed) % apeTotalFrames;
+    let frameX = currentFrame % 4; // 0,1,2,3
+    let frameY = Math.floor(currentFrame / 4); // changes every 4 frames
+
+    const apeWidth = 258, apeHeight = 256;
+
+    // 3. Draw to screen 
+    draw.drawImage( dancingApe, frameX * apeWidth, frameY * apeHeight, apeWidth, apeHeight, 2976 - camera.x, 466 - camera.y, tileSize*2, tileSize*2 );
+}
 
 function gameLoop(timestamp){  
+    frameCounter++;
     if (document.hidden) {
         requestAnimationFrame(gameLoop);
         return; // Stop the rest of the code from running
@@ -1098,6 +1187,7 @@ function gameLoop(timestamp){
                 screenActive.level2Active = false;
             }
         });
+        draw.drawImage(level2Door, 6016-camera.x, 448-camera.y);
 
         animate(2);
         if(player.x == 6049){
@@ -1106,7 +1196,7 @@ function gameLoop(timestamp){
 
             draw.fillStyle = "green";
             draw.font = ("50px Arial");
-            draw.fillText("You beat level 1!", 215, 300);
+            draw.fillText("You beat level 2!", 215, 300);
 
             screenActive.level2Active = false;
             setTimeout(changeLevel, 3000, 2);
@@ -1114,36 +1204,99 @@ function gameLoop(timestamp){
     }
 
     if(screenActive.level3Active){
-        draw.fillStyle = "purple";
+        draw.fillStyle = "white";
         draw.fillRect(0,0,canvas.width, canvas.height);
+        const worldWidth = level3[0].length * tileSize; // 6144
+        //console.log(worldWidth);
 
-        for(let row = 0; row < level3.length; row++){
+        // 3. Move Horizontally
+        // Consistency: By checking player.x > 0, you are checking the left edge of the hitbox regardless of which level or sprite you are using.
+        // Hitbox Width: On the right side, using player.x + hitBoxWidth ensures that the actual physical box stops at the edge, rather 
+        // than the invisible "empty space" around the sprite.
+        if (keys.right && player.x + hitBoxWidth < worldWidth && canMove) {        
+            player.x += player.speed;
+        } else if (keys.left && player.x > 0 && canMove) { // Use player.x directly
+            player.x -= player.speed;
+        }
+    
+        // shift + alt + A multiline comment and uncomment
+        // used for tile editor
+        /* for(let row = 0; row < level3.length; row++){
             for(let col = 0; col < level3[row].length; col++){
-                if(level2[row][col] == 0){
-                    draw.fillStyle = "darkblue";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
-                }
-                if(level2[row][col] == 1){
-                    draw.fillStyle = "yellow";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
-                }
-                if(level2[row][col] == 2){
-                    draw.fillStyle = "red";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
-                }
-                if(level2[row][col] == 3){
-                    draw.fillStyle = "orange";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
-                }
-                if(level2[row][col] == 4){
-                    draw.fillStyle = "violet";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
-                }
-                if(level2[row][col] == 5){
-                    draw.fillStyle = "lightblue";
-                    draw.fillRect(col*tileSize, row*tileSize, tileSize,tileSize);
+                // Calculate X position relative to the camera
+                let tileX = col * tileSize - camera.x;
+                let tileY = row * tileSize;
+
+                // USE LEVEL 3 DATA HERE
+                let tileID = level3[row][col]; 
+                // Only draw if the tile is actually visible on the canvas
+                if (tileX > -tileSize && tileX < canvas.width) {
+                    if(tileID == 0){ // background
+                        draw.fillStyle = "darkblue";
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 1){ // cars to walk on
+                        draw.fillStyle = "yellow";
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 2){
+                        draw.fillStyle = "orange"; // monster 1
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 3){
+                        draw.fillStyle = "green"; // monster 2
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 4){
+                        draw.fillStyle = "red"; // death fall
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 5){
+                        draw.fillStyle = "pink"; // 
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 6){
+                        draw.fillStyle = "magenta"; // jumpad
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
+                    else if(tileID == 7){
+                        draw.fillStyle = "darkred"; // random monster
+                        draw.fillRect(tileX, tileY, tileSize, tileSize);
+                    }
                 }
             }
+        } */
+        draw.drawImage(level3Background, 0, 0, canvas.width, canvas.height);
+        for(let row = 0; row < map3.length; row++){
+            for(let col = 0; col < map3[row].length; col++){
+                const tileIndex = map3[row][col]; // Get number from map1
+                const tileImage = level3Tiles[tileIndex]; // Get the corresponding image from the images[]
+                const screenX = col * tileSize - camera.x;
+                const screenY = row * tileSize - camera.y;
+                
+                if (tileImage) {
+                    draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
+                } else {
+                    console.warn(`Tile image missing for index: ${tileIndex}`);
+                }
+            }   
+        }
+
+        draw.fillStyle = "black";
+        draw.fillRect(player.x- camera.x, player.y - camera.y, 64,64);
+
+        dancingApeSprite();
+        if(player.x == 6049){
+            console.log("Beat level 3");
+            draw.fillStyle = "black";
+            draw.fillRect(0, 0, canvas.width, canvas.height);
+
+            draw.fillStyle = "green";
+            draw.font = ("50px Arial");
+            draw.fillText("You beat level 3!", 215, 300);
+
+            screenActive.level3Active = false;
+            setTimeout(changeLevel, 3000, 1);
         }
     }
     if(screenActive.level4Active){
