@@ -7,10 +7,10 @@ let bearImage = new Image();
 let robotImage = new Image();
 
 // Set the source files to get the images
-crabImage.src = "images/AICreated/Bing/Enemies/crabEnemy.png";
-mushroomImage.src = "images/AICreated/Gemini/Enemies/mushroomEnemy.png";
-bearImage.src = "images/AICreated/Gemini/Enemies/bearEnemy.png";
-robotImage.src = "images/AICreated/Gemini/Enemies/robotEnemy.png";
+crabImage.src = "images/Bing/Enemies/crabEnemy.png";
+mushroomImage.src = "images/Gemini/Enemies/mushroomEnemy.png";
+bearImage.src = "images/Gemini/Enemies/bearEnemy.png";
+robotImage.src = "images/Gemini/Enemies/robotEnemy.png";
 
 // Onload them so they are loaded properly
 crabImage.onload = () => {
