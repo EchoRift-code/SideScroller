@@ -1,13 +1,22 @@
-import {level1} from "./levels/level1.js";
-import {level2} from "./levels/level2.js";
+import { level1 } from "./levels/level1.js";
+import { level2 } from "./levels/level2.js";
 import { level3 } from "./levels/level3.js";
-import {menuBackground, settingsBackground, level1Door, level2Door} from "./loadImages/others.js";
-import { tiles, level3Tiles, dancingApe, level3Background } from "./loadImages/loadTiles.js";
-import { cyclopsImage, mushroomImage} from "./loadImages/loadEnemies.js";
-import { playerIdleLvl1, playerWalkLvl1, playerJumpLvl1, playerWalkLvl2 } from "./loadImages/loadPlayer.js";
+import { level4 } from "./levels/level4.js";
+import { level5 } from "./levels/level5.js";
 
+import { menuBackground, settingsBackground, level1Door, level1Background, level2Door,
+        level3Door, level4Background, level4Door, level5Background, level5Door } from "./loadImages/others.js";
+import { lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level5Tiles } from "./loadImages/loadTiles.js";
+
+import { crabImage, mushroomImage, bearImage, robotImage} from "./loadImages/loadEnemies.js";
+
+import { playerIdleLvl1, playerWalkLvl1, playerJumpLvl1, playerLvl2, playerIdleLvl3, playerIdleLvl4, playerIdleLvl5, playerJumpLvl3, 
+    playerJumpLvl4, playerJumpLvl5, playerWalkLvl3, playerWalkLvl4, playerWalkLvl5 } from "./loadImages/loadPlayer.js";
+
+    
 // Using spread operator [...] creates a shallow copy of the arrays
 let map1 = level1.map(row => [...row]), map2 = level2.map(row => [...row]), map3 = level3.map(row => [...row]);
+let map4 = level4.map(row => [...row]), map5 = level5.map(row => [...row]);
 
 window.onerror = function(message, source, lineno, colno, error){
     const log = document.createElement("div");
@@ -87,8 +96,8 @@ let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: false, settings: false, died: false, 
-                level1Active: false, level2Active: false, level3Active: true, level4Active: false, level5Active: false};
+let screenActive = {mainMenu: true, settings: false, died: false, 
+                level1Active: false, level2Active: false, level3Active: false, level4Active: false, level5Active: false};
 let player = { x: 64, y: 512, width: 96, height: 84, speed: 3};
 let hitboxX = 0, hitboxY = 0;
 
@@ -148,8 +157,8 @@ document.addEventListener("keydown", (e) => {
         state = "walk";
     }
     if (e.key === "p") { // Press 'P' to print
-        let output = "export const level3 = [\n";
-        level3.forEach(row => {
+        let output = "export const level5 = [\n";
+        map5.forEach(row => {
             output += "  [" + row.join(", ") + "],\n";
         });
         output += "];";
@@ -157,19 +166,19 @@ document.addEventListener("keydown", (e) => {
         console.log(output);
         alert("Level saved to Console! Press F12 to copy it.");
     }
-    if(e.key == "0"){ // Background
+    if(e.key == "0"){ // Background transparent
         selectedTile = 0;
         console.log(selectedTile);
     }else if(e.key == "1"){ // Tiles to walk on
         selectedTile = 1;
         console.log(selectedTile);
-    }else if(e.key == "2"){ // monster 1
+    }else if(e.key == "2"){ // death fall 
         selectedTile = 2;
         console.log(selectedTile);
-    }else if(e.key == "3"){ // monster 2
+    }else if(e.key == "3"){ // jumpad
         selectedTile = 3;
         console.log(selectedTile);
-    }else if(e.key == "4"){ // death fall
+    }else if(e.key == "4"){ // random dancing monster
         selectedTile = 4;
         console.log(selectedTile);
     }
@@ -177,12 +186,20 @@ document.addEventListener("keydown", (e) => {
         selectedTile = 5;
         console.log(selectedTile);
     }
-    else if(e.key == "6"){ // jumpad
+    else if(e.key == "6"){ // monster 1
         selectedTile = 6;
         console.log(selectedTile);
     }
-    else if(e.key == "7"){ // random dancing monster
+    else if(e.key == "7"){ // monster 2
         selectedTile = 7;
+        console.log(selectedTile);
+    }
+    else if(e.key == "8"){ // monster 3
+        selectedTile = 8;
+        console.log(selectedTile);
+    }
+    else if(e.key == "9"){ // monster 4
+        selectedTile = 9;
         console.log(selectedTile);
     }
 });
@@ -264,7 +281,6 @@ function setupButtons(btn, keyName){
 setupButtons(leftBtn, "left");
 setupButtons(rightBtn, "right");
 setupButtons(jumpBtn, "jump");
-
 
 canvas.addEventListener("click", (e) =>{
     if(!editorMode){
@@ -360,8 +376,8 @@ canvas.addEventListener("click", (e) =>{
         let row = Math.floor(mouseY / tileSize);
 
         // This updates the array in the browser's memory
-        if (level3[row] && col >= 0 && col < level3[row].length) {
-            level3[row][col] = selectedTile;
+        if (map5[row] && col >= 0 && col < map5[row].length) {
+            map5[row][col] = selectedTile;
             console.log(`Placed tile ${selectedTile} at row: ${row}, col: ${col}`);
         }
     }
@@ -494,7 +510,7 @@ function updateNPC(npc, moveState, levelMap) {
     let wallTile = (levelMap[wallRow] && levelMap[wallRow][tileCol]);
 
     // If there's no floor OR there is a wall, turn around
-    if (floorTile !== 4 || wallTile === 4) {
+    if (floorTile !== 1 || wallTile === 1) {
         moveState.movingLeft = !moveState.movingLeft;
         moveState.movingRight = !moveState.movingRight;
     }
@@ -509,15 +525,20 @@ function updateNPC(npc, moveState, levelMap) {
 
 // 1. Update your registry at the top of your code
 const enemyRegistry = {
-    10: 'cyclops',
-    11: 'mushroom'
+    6: 'crab',
+    7: 'mushroom',
+    8: 'bear',
+    9: 'robot'
 };
 
 // 2. Update your images dictionary
 const enemySprites = {
-    'cyclops': cyclopsImage,    // Your cyclops sprite sheet
-    'mushroom': mushroomImage   // Your mushroom sprite sheet
+    'crab': crabImage,    // Your cyclops sprite sheet
+    'mushroom': mushroomImage,   // Your mushroom sprite sheet
+    'bear': bearImage,
+    'robot': robotImage
 };
+
 
 let enemies = [];
 function spawnEnemies(levelMap) {
@@ -552,10 +573,11 @@ function spawnEnemies(levelMap) {
     }
 }
 
+// Universal for all the sprites
 let idleFrame = 0;
 let walkFrame = 0;
 let jumpFrame = 0;
-let idleTimer = 0;
+let idleTimer = 0; 
 let walkTimer = 0;
 let jumpTimer = 0;
 
@@ -590,16 +612,14 @@ function animate(level){
                         idleFrame = (idleFrame + 1) % totalIdleFrames;
                         idleTimer = 0;
                     } 
-                    // Apply flipping to idle too if you want!
+                  
                     if (goingRight) {
-                        draw.drawImage(playerIdleLvl1, sxidle, 0, frameWidth, frameHeight, 
-                                    drawX, drawY, renderedWidth, renderedHeight);
+                        draw.drawImage(playerIdleLvl1, sxidle, 0, frameWidth, frameHeight, drawX, drawY, renderedWidth, renderedHeight);
                     } else {
                         draw.save();
                         draw.translate(drawX + renderedWidth, drawY);
                         draw.scale(-1, 1);
-                        draw.drawImage(playerIdleLvl1, sxidle, 0, frameWidth, frameHeight, 
-                                    0, 0, renderedWidth, renderedHeight);
+                        draw.drawImage(playerIdleLvl1, sxidle, 0, frameWidth, frameHeight, 0, 0, renderedWidth, renderedHeight);
                         draw.restore();
                     }
                     break;   
@@ -614,8 +634,7 @@ function animate(level){
                     
                     // draw frame
                     if(goingRight){
-                        draw.drawImage(playerWalkLvl1, walkFrame * frameWidth, 0, frameWidth, frameHeight, 
-                            drawX, drawY, renderedWidth, renderedHeight);
+                        draw.drawImage(playerWalkLvl1, walkFrame * frameWidth, 0, frameWidth, frameHeight, drawX, drawY, renderedWidth, renderedHeight);
                     }else if(!goingRight){
                         // FLIPPING LOGIC
                         draw.save();
@@ -624,8 +643,7 @@ function animate(level){
                         // Flip the horizontal axis
                         draw.scale(-1, 1);
                         // Draw at 0,0 because we translated to the destination
-                        draw.drawImage(playerWalkLvl1, sxwalk, 0, frameWidth, frameHeight, 
-                                    0, 0, renderedWidth, renderedHeight);
+                        draw.drawImage(playerWalkLvl1, sxwalk, 0, frameWidth, frameHeight, 0, 0, renderedWidth, renderedHeight);
                         draw.restore();
                     }
                     break;
@@ -637,16 +655,14 @@ function animate(level){
                         jumpFrame = (jumpFrame + 1) % totalJumpFrames;
                         jumpTimer = 0;
                     }
-                    // Apply flipping to idle too if you want!
+                    
                     if (goingRight) {
-                        draw.drawImage(playerJumpLvl1, sxjump, 0, frameWidth, frameHeight, 
-                                    drawX, drawY, renderedWidth, renderedHeight);
+                        draw.drawImage(playerJumpLvl1, sxjump, 0, frameWidth, frameHeight, drawX, drawY, renderedWidth, renderedHeight);
                     } else {
                         draw.save();
                         draw.translate(drawX + renderedWidth, drawY);
                         draw.scale(-1, 1);
-                        draw.drawImage(playerJumpLvl1, sxjump, 0, frameWidth, frameHeight, 
-                                    0, 0, renderedWidth, renderedHeight);
+                        draw.drawImage(playerJumpLvl1, sxjump, 0, frameWidth, frameHeight, 0, 0, renderedWidth, renderedHeight);
                         draw.restore();
                     }
                     break;
@@ -674,7 +690,7 @@ function animate(level){
                     
                     if (goingRight) {
                         // Draw normally at drawX, drawY
-                        draw.drawImage(playerWalkLvl2, sxidle, 128, dogWidth, dogHeight, drawX, drawY, dogWidthInc, dogHeightInc);
+                        draw.drawImage(playerLvl2, sxidle, 128, dogWidth, dogHeight, drawX, drawY, dogWidthInc, dogHeightInc);
                     } else {
                         draw.save();
                         // Move to the right edge of the sprite's destination
@@ -684,7 +700,7 @@ function animate(level){
                         // The Scale: draw.scale(-1, 1) flips the world horizontally from that point
                         draw.scale(-1, 1);
                         // Draw at 0, 0 because the "paper" was moved to drawX, drawY
-                        draw.drawImage(playerWalkLvl2, sxidle, 128, dogWidth, dogHeight, 
+                        draw.drawImage(playerLvl2, sxidle, 128, dogWidth, dogHeight, 
                                         0, 0, dogWidthInc, dogHeightInc);
                         draw.restore();
                     }
@@ -700,7 +716,7 @@ function animate(level){
                     
                     if (goingRight) {
                         // Use drawX and drawY so the dog follows the player hitbox
-                        draw.drawImage(playerWalkLvl2, sxwalk, 250, 32, 32, 
+                        draw.drawImage(playerLvl2, sxwalk, 250, 32, 32, 
                                         drawX, drawY, dogWidthInc, dogHeightInc);
                     } else {
                         draw.save();
@@ -708,7 +724,7 @@ function animate(level){
                         draw.translate(drawX + dogWidthInc, drawY); 
                         draw.scale(-1, 1);
                         // Draw at 0,0
-                        draw.drawImage(playerWalkLvl2, sxwalk, 250, 32, 32, 
+                        draw.drawImage(playerLvl2, sxwalk, 250, 32, 32, 
                                         0, 0, dogWidthInc, dogHeightInc);
                         draw.restore();
                     }
@@ -721,22 +737,253 @@ function animate(level){
                         jumpTimer = 0;
                     }
                     if (goingRight) {
-                        draw.drawImage(playerWalkLvl2, sxjump, 250, 32, 32, 
+                        draw.drawImage(playerLvl2, sxjump, 250, 32, 32, 
                                         drawX, drawY, dogWidthInc, dogHeightInc);
                     } else {
                         draw.save();
                         draw.translate(drawX + dogWidthInc, drawY);
                         draw.scale(-1, 1);
-                        draw.drawImage(playerWalkLvl2, sxjump, 250, 32, 32, 0, 0, dogWidthInc, dogHeightInc);
+                        draw.drawImage(playerLvl2, sxjump, 250, 32, 32, 0, 0, dogWidthInc, dogHeightInc);
                         draw.restore();
                     }
                     break;
             }
+            break;
+        case 3:
+            drawX = player.x - camera.x;
+            drawY = player.y - camera.y;
+            const santaWidth = 934, santaHeight = 641;
+            const santaAnimationSpeed = 10;
+            const santaWidthInc = 112, santaHeightInc = 112;
+            const totalIdleSantaFrames = 16;
+            const totalWalkSantaFrames = 13;
+            const totalJumpSantaFrames = 16;
+            switch(state){
+                case "idle":
+                    const santaSourceXIdle = idleFrame * santaWidth;
+                    idleTimer++;
+
+                    if (idleTimer >= santaAnimationSpeed) {
+                        idleFrame = (idleFrame + 1) % totalIdleSantaFrames;
+                        idleTimer = 0;
+                    } 
+                    
+                    if (goingRight) {
+                        // Draw normally at drawX, drawY
+                        draw.drawImage(playerIdleLvl3, santaSourceXIdle, 0, santaWidth, santaHeight, drawX, drawY-28, santaWidthInc, santaHeightInc);
+                    } else {
+                        draw.save();
+                        // Move to the right edge of the sprite's destination
+                        // The Translation: draw.translate(drawX + width, drawY) sets the top-left corner 
+                        // of your "new" coordinate system to where the player's right side should be.
+                        draw.translate(drawX + santaWidthInc, drawY);
+                        // The Scale: draw.scale(-1, 1) flips the world horizontally from that point
+                        draw.scale(-1, 1);
+                        // Draw at 0, 0 because the "paper" was moved to drawX, drawY
+                        draw.drawImage(playerIdleLvl3, santaSourceXIdle, 0, santaWidth, santaHeight, 0, 0-28, santaWidthInc, santaHeightInc);
+                        draw.restore();
+                    }
+                    break;   
+                case "walk":    
+                    const santaSourceXWalk = walkFrame * santaWidth;
+                    walkTimer++;
+
+                    if (walkTimer >= santaAnimationSpeed) {
+                        walkFrame = (walkFrame + 1) % totalWalkSantaFrames;
+                        walkTimer = 0;
+                    }
+                    
+                    if (goingRight) {
+                        // Use drawX and drawY so the dog follows the player hitbox
+                        draw.drawImage(playerWalkLvl3, santaSourceXWalk, 0, santaWidth, santaHeight, drawX, drawY-28, santaWidthInc, santaHeightInc);
+                    } else {
+                        draw.save();
+                        // Use 88 here because that is the width you are drawing
+                        draw.translate(drawX + santaWidthInc, drawY); 
+                        draw.scale(-1, 1);
+                        // Draw at 0,0
+                        draw.drawImage(playerWalkLvl3, santaSourceXWalk, 0, santaWidth, santaHeight, 0, 0-28, santaWidthInc, santaHeightInc);
+                        draw.restore();
+                    }
+                    break;
+                case "jump":
+                    const santaSourceXJump = jumpFrame * santaWidth;
+                    jumpTimer++;
+                    if (jumpTimer >= santaAnimationSpeed) {
+                        jumpFrame = (jumpFrame + 1) % totalJumpSantaFrames;
+                        jumpTimer = 0;
+                    }
+                    if (goingRight) {
+                        draw.drawImage(playerJumpLvl3, santaSourceXJump, 0, santaWidth, santaHeight, drawX, drawY-28, santaWidthInc, santaHeightInc);
+                    } else {
+                        draw.save();
+                        draw.translate(drawX + santaWidthInc, drawY);
+                        draw.scale(-1, 1);
+                        draw.drawImage(playerJumpLvl3, santaSourceXJump, 0, santaWidth, santaHeight, 0, 0-28, santaWidthInc, santaHeightInc);
+                        draw.restore();
+                    }
+                    break;
+            }
+            break;
+        case 4:
+            drawX = player.x - camera.x;
+            drawY = player.y - camera.y-24;
+            const dinoWidth = 680, dinoHeight = 472;
+            const dinoAnimationSpeed = 10;
+            const dinoWidthInc = 100, dinoHeightInc = 100;
+            const totalIdleDinoFrames = 10;
+            const totalWalkDinoFrames = 10;
+            const totalJumpDinoFrames = 12;
+            switch(state){
+                case "idle":
+                    const dinoSourceXIdle = idleFrame * dinoWidth;
+                    idleTimer++;
+
+                    if (idleTimer >= dinoAnimationSpeed) {
+                        idleFrame = (idleFrame + 1) % totalIdleDinoFrames;
+                        idleTimer = 0;
+                    } 
+                    
+                    if (goingRight) {
+                        // Draw normally at drawX, drawY
+                        draw.drawImage(playerIdleLvl4, dinoSourceXIdle, 0, dinoWidth, dinoHeight, drawX, drawY, dinoWidthInc, dinoHeightInc);
+                    } else {
+                        draw.save();
+                        // Move to the right edge of the sprite's destination
+                        // The Translation: draw.translate(drawX + width, drawY) sets the top-left corner 
+                        // of your "new" coordinate system to where the player's right side should be.
+                        draw.translate(drawX + dinoWidthInc, drawY);
+                        // The Scale: draw.scale(-1, 1) flips the world horizontally from that point
+                        draw.scale(-1, 1);
+                        // Draw at 0, 0 because the "paper" was moved to drawX, drawY
+                        draw.drawImage(playerIdleLvl4, dinoSourceXIdle, 0, dinoWidth, dinoHeight, 0, 0, dinoWidthInc, dinoHeightInc);
+                        draw.restore();
+                    }
+                    break;   
+                case "walk":    
+                    const dinoSourceXWalk = walkFrame * dinoWidth;
+                    walkTimer++;
+
+                    if (walkTimer >= dinoAnimationSpeed) {
+                        walkFrame = (walkFrame + 1) % totalWalkDinoFrames;
+                        walkTimer = 0;
+                    }
+                    
+                    if (goingRight) {
+                        // Use drawX and drawY so the skin follows the player hitbox
+                        draw.drawImage(playerWalkLvl4, dinoSourceXWalk, 0, dinoWidth, dinoHeight, drawX, drawY, dinoWidthInc, dinoHeightInc);
+                    } else {
+                        draw.save();
+                        
+                        draw.translate(drawX + dinoWidthInc, drawY); 
+                        draw.scale(-1, 1);
+                        // Draw at 0,0
+                        draw.drawImage(playerWalkLvl4, dinoSourceXWalk, 0, dinoWidth, dinoHeight, 0, 0, dinoWidthInc, dinoHeightInc);
+                        draw.restore();
+                    }
+                    break;
+                case "jump":
+                    const dinoSourceXJump = jumpFrame * dinoWidth;
+                    jumpTimer++;
+                    if (jumpTimer >= dinoAnimationSpeed) {
+                        jumpFrame = (jumpFrame + 1) % totalJumpDinoFrames;
+                        jumpTimer = 0;
+                    }
+                    if (goingRight) {
+                        draw.drawImage(playerJumpLvl4, dinoSourceXJump, 0, dinoWidth, dinoHeight, drawX, drawY, dinoWidthInc, dinoHeightInc);
+                    } else {
+                        draw.save();
+                        draw.translate(drawX + dinoWidthInc, drawY);
+                        draw.scale(-1, 1);
+                        draw.drawImage(playerJumpLvl4, dinoSourceXJump, 0, dinoWidth, dinoHeight, 0, 0, dinoWidthInc, dinoHeightInc);
+                        draw.restore();
+                    }
+                    break;
+            }
+            break;
+        case 5:
+            drawX = player.x - camera.x;
+            drawY = player.y - camera.y;
+            const ninjaBoyIdleWidth = 232, ninjaBoyIdleHeight = 439;
+            const ninjaBoyWalkWidth = 3630/10, ninjaBoyWalkHeight= 458;
+            const ninjaBoyJumpWidth = 3630/10, ninjaBoyJumpHeight= 483;
+            const ninjaBoyAnimationSpeed = 40;
+            const ninjaBoyWidthInc = 64, ninjaBoyHeightInc = 64;
+            const totalIdleninjaBoyFrames = 10;
+            const totalWalkninjaBoyFrames = 10;
+            const totalJumpninjaBoyFrames = 10;
+            switch(state){
+                case "idle":       
+                    const ninjaBoySourceXIdle = idleFrame * ninjaBoyIdleWidth;
+                    idleTimer++;
+
+                    if (idleTimer >= ninjaBoyAnimationSpeed) {
+                        idleFrame = (idleFrame + 1) % totalIdleninjaBoyFrames;
+                        idleTimer = 0;
+                    } 
+                    
+                    if (goingRight) {
+                        // Draw normally at drawX, drawY
+                        draw.drawImage(playerIdleLvl5, ninjaBoySourceXIdle, 0, ninjaBoyIdleWidth, ninjaBoyIdleHeight, drawX, drawY, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                    } else {
+                        draw.save();
+                        // Move to the right edge of the sprite's destination
+                        // The Translation: draw.translate(drawX + width, drawY) sets the top-left corner 
+                        // of your "new" coordinate system to where the player's right side should be.
+                        draw.translate(drawX + ninjaBoyWidthInc, drawY);
+                        // The Scale: draw.scale(-1, 1) flips the world horizontally from that point
+                        draw.scale(-1, 1);
+                        // Draw at 0, 0 because the "paper" was moved to drawX, drawY
+                        draw.drawImage(playerIdleLvl5, ninjaBoySourceXIdle, 0, ninjaBoyIdleWidth, ninjaBoyIdleHeight, 0, 0, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                        draw.restore();
+                    }
+                    break;   
+                case "walk":    
+                    const ninjaBoySourceXWalk = walkFrame * ninjaBoyWalkWidth;
+                    walkTimer++;
+
+                    if (walkTimer >= ninjaBoyAnimationSpeed) {
+                        walkFrame = (walkFrame + 1) % totalWalkninjaBoyFrames;
+                        walkTimer = 0;
+                    }
+                    
+                    if (goingRight) {
+                        // Use drawX and drawY so the dog follows the player hitbox
+                        draw.drawImage(playerWalkLvl5, ninjaBoySourceXWalk, 0, ninjaBoyWalkWidth, ninjaBoyWalkHeight, drawX, drawY, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                    } else {
+                        draw.save();
+                        // Use 88 here because that is the width you are drawing
+                        draw.translate(drawX + ninjaBoyWidthInc, drawY); 
+                        draw.scale(-1, 1);
+                        // Draw at 0,0
+                        draw.drawImage(playerWalkLvl5, ninjaBoySourceXWalk, 0, ninjaBoyWalkWidth, ninjaBoyWalkHeight, 0, 0, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                        draw.restore();
+                    }
+                    break;
+                case "jump":
+                    const ninjaBoySourceXJump = jumpFrame * ninjaBoyJumpWidth;
+                    jumpTimer++;
+                    if (jumpTimer >= ninjaBoyAnimationSpeed) {
+                        jumpFrame = (jumpFrame + 1) % totalJumpninjaBoyFrames;
+                        jumpTimer = 0;
+                    }
+                    if (goingRight) {
+                        draw.drawImage(playerJumpLvl5, ninjaBoySourceXJump, 0, ninjaBoyJumpWidth, ninjaBoyJumpHeight, drawX, drawY, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                    } else {
+                        draw.save();
+                        draw.translate(drawX + ninjaBoyWidthInc, drawY);
+                        draw.scale(-1, 1);
+                        draw.drawImage(playerJumpLvl5, ninjaBoySourceXJump, 0, ninjaBoyJumpWidth, ninjaBoyJumpHeight, 0, 0, ninjaBoyWidthInc, ninjaBoyHeightInc);
+                        draw.restore();
+                    }
+                    break;    
+            }
+            break;
     }
 }
 
 function updateAndDrawEnemy(npc) {
-    // 1. Update the animation timer
+    // 1. Animation Logic (Stay the same)
     npc.tickCount++;
     if (npc.tickCount > npc.ticksPerFrame) {
         npc.tickCount = 0;
@@ -744,22 +991,27 @@ function updateAndDrawEnemy(npc) {
         if (npc.frameIndex >= 4) { npc.frameIndex = 0; }
     }
 
-    // 2. Determine which column to use based on direction
-    let sw = npc.image.width / 4;
-    let sh = npc.image.height / 4;
-    
-    let columnIndex;
-    if (npc.moveState.movingRight) {
-        columnIndex = 3; // 3rd Column
-    } else {
-        columnIndex = 2; // 2nd Column (Adjust this index to match your sheet!)
+    let sw = npc.image.width / 4; 
+    let sh = npc.image.height;
+    let sx = npc.frameIndex * sw;
+
+    draw.save(); 
+
+    // 2. If moving LEFT, flip the image (because the image faces right)
+    if (npc.moveState.movingLeft) { 
+        // Move to the position, then flip
+        draw.translate(npc.x - camera.x + tileSize, 0); 
+        draw.scale(-1, 1); 
+        
+        // Draw at 0 (the flipped coordinate)
+        draw.drawImage(npc.image, sx, 0, sw, sh, 0, npc.y - camera.y, tileSize, tileSize);
+    } 
+    // 3. If moving RIGHT (or standing still), draw normally
+    else {
+        draw.drawImage(npc.image, sx, 0, sw, sh, npc.x - camera.x, npc.y - camera.y, tileSize, tileSize);
     }
 
-    let sx = columnIndex * sw; 
-    let sy = npc.frameIndex * sh;
-
-    // 3. Draw to screen
-    draw.drawImage( npc.image, sx, sy, sw, sh, npc.x - camera.x, npc.y - camera.y, tileSize, tileSize );
+    draw.restore(); 
 }
 
 function resetLevels(){
@@ -849,7 +1101,7 @@ function gameLoop(timestamp){
         draw.fillText("START", startButton.x+20, startButton.y+38);                 
         draw.fillText("SETTING", settingButton.x, settingButton.y+38);  
     }
-    if(screenActive.settings){
+    else if(screenActive.settings){
         draw.drawImage(settingsBackground, 0, 0);
         // Draw the rectangles for the button
         draw.fillStyle = "red";
@@ -874,7 +1126,7 @@ function gameLoop(timestamp){
         
     }
     
-    if(screenActive.died){
+    else if(screenActive.died){
         diedScreenActive = true;
         velocityY = 0;
         draw.fillStyle = "black";
@@ -896,7 +1148,7 @@ function gameLoop(timestamp){
         // Will call function after the set time. 3000 = 3 seconds
         //setTimeout(changeState, 3000);
     }
-    if(screenActive.level1Active){
+    else if(screenActive.level1Active){
         // Erase EVERYTHING before drawing the new frame
         draw.clearRect(0, 0, canvas.width, canvas.height);
         // --- NEW: ONLY SPAWN ONCE ---
@@ -933,11 +1185,12 @@ function gameLoop(timestamp){
         // Update Hitbox X after moving X
         hitboxX = player.x + offsetX;
         
+        draw.drawImage(level1Background, 0, 0, 832, 640);
         // Draw tiles
         for(let row = 0; row < map1.length; row++){
             for(let col = 0; col < map1[row].length; col++){
                 const tileIndex = map1[row][col]; // Get number from map1
-                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
+                const tileImage = lvl1Tiles[tileIndex]; // Get the corresponding image from the images[]
                 const screenX = col * tileSize - camera.x;
                 const screenY = row * tileSize - camera.y;
                 
@@ -957,7 +1210,7 @@ function gameLoop(timestamp){
                 let tileX = col * tileSize;
                 let tileY = row * tileSize;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(map1[row][col] == 4){
+                if(map1[row][col] == 1){
                     // Check overlap using HITBOX coordinates
                     // Standard AABB check: Is the player's HITBOX touching the tile?
                     if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY) {
@@ -980,7 +1233,7 @@ function gameLoop(timestamp){
                         }
                     }
                 }
-                if (map1[row][col] == 5) {
+                if (map1[row][col] == 2) {
                     // If the bottom of the hitbox is below the top of the pit tile
                     if (player.y + hitBoxHeight > tileY + 1) {
                         canMove = false;
@@ -994,7 +1247,7 @@ function gameLoop(timestamp){
                         screenActive.level1Active = false;
                     }
                 }
-                if (map1[row][col] == 6) {
+                if (map1[row][col] == 3) {
                     if (player.x < tileX + tileSize && 
                         player.x + hitBoxWidth > tileX && 
                         player.y < tileY + tileSize && 
@@ -1021,10 +1274,8 @@ function gameLoop(timestamp){
             updateAndDrawEnemy(npc); 
 
             // 3. Collision
-            if (player.x < npc.x + 37 && 
-                player.x + hitBoxWidth > npc.x + 13 && 
-                player.y < npc.y + tileSize && 
-                player.y + hitBoxHeight > npc.y) {
+            if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
+                player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
                 
                 screenActive.died = true;
                 screenActive.level1Active = false;
@@ -1032,7 +1283,7 @@ function gameLoop(timestamp){
         });
 
         //draw.fillRect(400, 200, 64, 64);
-        draw.drawImage(level1Door, 6016-camera.x, 448-camera.y);
+        draw.drawImage(level1Door, 6016-camera.x, 478-camera.y, 128, 128);
         animate(1);
         
         if(player.x == 6049){
@@ -1048,52 +1299,34 @@ function gameLoop(timestamp){
             setTimeout(changeLevel, 3000, 1);
         }
     }
-    if(screenActive.level2Active){
-        // Erase EVERYTHING before drawing the new frame
+    else if(screenActive.level2Active){
         draw.clearRect(0, 0, canvas.width, canvas.height);
-        // --- NEW: ONLY SPAWN ONCE ---
         if (!levelLoaded) {
             console.log("did i spawn enemies?");
             spawnEnemies(map2); 
-            levelLoaded = true; // This prevents it from running again next frame
+            levelLoaded = true; 
         }
-        // 1. Reset Ground State (Crucial: Assume in air until proven otherwise)
         onGround = false;
-
-        // 1. Capture Old Position (Before movement)
         let pOldX = player.x;
         let pOldY = player.y;
-
-        // 2. Apply Physics
         velocityY += gravity;
         player.y += velocityY;
-        
-        // Update Hitbox Y after moving Y
         hitboxY = player.y + offsetY;
-        
-        // Calculate the total width of the game world (not the screen)
-        // So: total world width = number of tiles * tile size
+    
         const worldWidth = map2[0].length * tileSize; // 6144
-        //console.log(worldWidth);
-
-        // 3. Move Horizontally
-        // Consistency: By checking player.x > 0, you are checking the left edge of the hitbox regardless of which level or sprite you are using.
-        // Hitbox Width: On the right side, using player.x + hitBoxWidth ensures that the actual physical box stops at the edge, rather 
-        // than the invisible "empty space" around the sprite.
         if (keys.right && player.x + hitBoxWidth < worldWidth && canMove) {        
             player.x += player.speed;
         } else if (keys.left && player.x > 0 && canMove) { // Use player.x directly
             player.x -= player.speed;
         }
-
-        // Update Hitbox X after moving X
         hitboxX = player.x + offsetX;
-        
+
+        draw.drawImage(level1Background, 0, 0, 832, 640);
         // Draw tiles
         for(let row = 0; row < map2.length; row++){
             for(let col = 0; col < map2[row].length; col++){
                 const tileIndex = map2[row][col]; // Get number from map1
-                const tileImage = tiles[tileIndex]; // Get the corresponding image from the images[]
+                const tileImage = lvl1Tiles[tileIndex]; // Get the corresponding image from the images[]
                 const screenX = col * tileSize - camera.x;
                 const screenY = row * tileSize - camera.y;
                 
@@ -1102,8 +1335,6 @@ function gameLoop(timestamp){
                 } else {
                     console.warn(`Tile image missing for index: ${tileIndex}`);
                 }
-    
-                //draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
             }   
         }
         
@@ -1113,7 +1344,7 @@ function gameLoop(timestamp){
                 let tileX = col * tileSize;
                 let tileY = row * tileSize;
                 //  Prevents player from falling through floor while gravity if constantly active
-                if(map2[row][col] == 4){
+                if(map2[row][col] == 1){
                     // Check overlap using HITBOX coordinates
                     // Standard AABB check: Is the player's HITBOX touching the tile?
                     if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY) {
@@ -1136,7 +1367,7 @@ function gameLoop(timestamp){
                         }
                     }
                 }
-                if (map2[row][col] == 5) {
+                if (map2[row][col] == 2) {
                     // If the bottom of the hitbox is below the top of the pit tile
                     if (player.y + hitBoxHeight > tileY + 1) {
                         canMove = false;
@@ -1150,7 +1381,7 @@ function gameLoop(timestamp){
                         screenActive.level2Active = false;
                     }
                 }
-                if (map2[row][col] == 6) {
+                if (map2[row][col] == 3) {
                     if (player.x < tileX + tileSize && 
                         player.x + hitBoxWidth > tileX && 
                         player.y < tileY + tileSize && 
@@ -1163,34 +1394,21 @@ function gameLoop(timestamp){
                 }
             }
         }
-       
-        // DRAW AND UPDATE ALL ENEMIES ---
-        // 1. enemies.forEach(npc => { ... })
-        //enemies: This is your array (the "list") of all NPCs.
-        //.forEach: This is a loop. It tells JavaScript: "Take every single item inside the enemies list, one by one, and do the following stuff to it."
-        //npc: This is a temporary nickname. For the first loop, npc is Ogre 1. For the second loop, npc is mushroom 1. It saves you from having to type specific names.
+     
         enemies.forEach(npc => {
-            // 1. Logic (Turn around at walls/cliffs)
             updateNPC(npc, npc.moveState, map2);
-
-            // 2. Animation & Drawing
-            // This function now uses npc.image, npc.frameIndex, etc.
             updateAndDrawEnemy(npc); 
-
-            // 3. Collision
-            if (player.x < npc.x + 37 && 
-                player.x + hitBoxWidth > npc.x + 13 && 
-                player.y < npc.y + tileSize && 
-                player.y + hitBoxHeight > npc.y) {
+            if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
+                player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
                 
                 screenActive.died = true;
                 screenActive.level2Active = false;
             }
         });
-        draw.drawImage(level2Door, 6016-camera.x, 448-camera.y);
+        draw.drawImage(level2Door, 6016-camera.x, 468-camera.y, 128, 128);
 
         animate(2);
-        if(player.x == 6049){
+        if(player.x >= worldWidth - 128){
             draw.fillStyle = "black";
             draw.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1202,23 +1420,28 @@ function gameLoop(timestamp){
             setTimeout(changeLevel, 3000, 2);
         }
     }
+    else if(screenActive.level3Active){ 
+        draw.clearRect(0, 0, canvas.width, canvas.height);
+        if (!levelLoaded) {
+            console.log("did i spawn enemies?");
+            spawnEnemies(map3); 
+            levelLoaded = true;
+        }
+        onGround = false;
 
-    if(screenActive.level3Active){
-        draw.fillStyle = "white";
-        draw.fillRect(0,0,canvas.width, canvas.height);
-        const worldWidth = level3[0].length * tileSize; // 6144
-        //console.log(worldWidth);
+        let pOldX = player.x;
+        let pOldY = player.y;
+        velocityY += gravity;
+        player.y += velocityY;
+        hitboxY = player.y + offsetY;
 
-        // 3. Move Horizontally
-        // Consistency: By checking player.x > 0, you are checking the left edge of the hitbox regardless of which level or sprite you are using.
-        // Hitbox Width: On the right side, using player.x + hitBoxWidth ensures that the actual physical box stops at the edge, rather 
-        // than the invisible "empty space" around the sprite.
+        const worldWidth = map3[0].length * tileSize; // 6144
         if (keys.right && player.x + hitBoxWidth < worldWidth && canMove) {        
             player.x += player.speed;
-        } else if (keys.left && player.x > 0 && canMove) { // Use player.x directly
+        } else if (keys.left && player.x > 0 && canMove) {
             player.x -= player.speed;
         }
-    
+        hitboxX = player.x + offsetX;
         // shift + alt + A multiline comment and uncomment
         // used for tile editor
         /* for(let row = 0; row < level3.length; row++){
@@ -1235,24 +1458,20 @@ function gameLoop(timestamp){
                         draw.fillStyle = "darkblue";
                         draw.fillRect(tileX, tileY, tileSize, tileSize);
                     }
-                    else if(tileID == 1){ // cars to walk on
+                    else if(tileID == 4){ // cars to walk on
                         draw.fillStyle = "yellow";
                         draw.fillRect(tileX, tileY, tileSize, tileSize);
                     }
-                    else if(tileID == 2){
+                    else if(tileID == 10){
                         draw.fillStyle = "orange"; // monster 1
                         draw.fillRect(tileX, tileY, tileSize, tileSize);
                     }
-                    else if(tileID == 3){
+                    else if(tileID == 11){
                         draw.fillStyle = "green"; // monster 2
                         draw.fillRect(tileX, tileY, tileSize, tileSize);
                     }
-                    else if(tileID == 4){
-                        draw.fillStyle = "red"; // death fall
-                        draw.fillRect(tileX, tileY, tileSize, tileSize);
-                    }
                     else if(tileID == 5){
-                        draw.fillStyle = "pink"; // 
+                        draw.fillStyle = "red"; // death fall
                         draw.fillRect(tileX, tileY, tileSize, tileSize);
                     }
                     else if(tileID == 6){
@@ -1281,12 +1500,79 @@ function gameLoop(timestamp){
                 }
             }   
         }
+        
+        // Check collisions with tiles
+        for(let row = 0; row < map3.length; row++){
+            for(let col = 0; col < map3[row].length; col++){
+                let tileX = col * tileSize;
+                let tileY = row * tileSize;
+                //  Prevents player from falling through floor while gravity if constantly active
+                if(map3[row][col] == 1){
+                    // Check overlap using HITBOX coordinates
+                    // Standard AABB check: Is the player's HITBOX touching the tile?
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY) {
+                        // Resolve Vertical (Top/Bottom)
+                        if (pOldY + hitBoxHeight <= tileY) { // Landed on Top
+                            player.y = tileY - hitBoxHeight;
+                            velocityY = 0;
+                            onGround = true;
+                        } 
+                        else if (pOldY >= tileY + tileSize) { // Hit Head
+                            player.y = tileY + tileSize;
+                            velocityY = 0;
+                        }
+                        // Resolve Horizontal (Sides)
+                        else if (pOldX + hitBoxWidth <= tileX) { // Left Wall
+                            player.x = tileX - hitBoxWidth;
+                        }
+                        else if (pOldX >= tileX + tileSize) { // Right Wall
+                            player.x = tileX + tileSize;
+                        }
+                    }
+                }
+                if (map3[row][col] == 2) {
+                    // If the bottom of the hitbox is below the top of the pit tile
+                    if (player.y + hitBoxHeight > tileY + 1) {
+                        canMove = false;
+                    } else {
+                        canMove = true;
+                    }
 
-        draw.fillStyle = "black";
-        draw.fillRect(player.x- camera.x, player.y - camera.y, 64,64);
+                    // Death trigger: If hitbox is fully inside/below the pit tile
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY + tileSize) {      
+                        screenActive.died = true;
+                        screenActive.level3Active = false;
+                    }
+                }
+                if (map3[row][col] == 3) {
+                    if (player.x < tileX + tileSize && 
+                        player.x + hitBoxWidth > tileX && 
+                        player.y < tileY + tileSize && 
+                        player.y + hitBoxHeight > tileY) {
+                        
+                        onJumpPad = true;
+                        //console.log(onJumpPad);
+                    }
+                    
+                }
+            }
+        }
 
+        enemies.forEach(npc => {
+            updateNPC(npc, npc.moveState, map3);
+            updateAndDrawEnemy(npc); 
+            if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
+                player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
+                
+                screenActive.died = true;
+                screenActive.level3Active = false;
+            }
+        });
+        draw.drawImage(level3Door, 6016-camera.x, 468-camera.y, 128, 128);
         dancingApeSprite();
-        if(player.x == 6049){
+        animate(3);
+        
+        if(player.x >= worldWidth-176){
             console.log("Beat level 3");
             draw.fillStyle = "black";
             draw.fillRect(0, 0, canvas.width, canvas.height);
@@ -1296,18 +1582,257 @@ function gameLoop(timestamp){
             draw.fillText("You beat level 3!", 215, 300);
 
             screenActive.level3Active = false;
-            setTimeout(changeLevel, 3000, 1);
+            setTimeout(changeLevel, 3000, 3);
         }
     }
-    if(screenActive.level4Active){
+    else if(screenActive.level4Active){
+        draw.clearRect(0, 0, canvas.width, canvas.height);
+        if (!levelLoaded) {
+            console.log("did i spawn enemies?");
+            spawnEnemies(map4); 
+            levelLoaded = true;
+        }
+        onGround = false;
 
-    }
-    if(screenActive.level5Active){
+        let pOldX = player.x;
+        let pOldY = player.y;
+        velocityY += gravity;
+        player.y += velocityY;
+        hitboxY = player.y + offsetY;
 
+        const worldWidth = map4[0].length * tileSize; // 6144
+        if (keys.right && player.x + hitBoxWidth < worldWidth && canMove) {        
+            player.x += player.speed;
+        } else if (keys.left && player.x > 0 && canMove) {
+            player.x -= player.speed;
+        }
+        hitboxX = player.x + offsetX; 
+ 
+        draw.drawImage(level4Background, 0, 0, 832, 640);
+        for(let row = 0; row < map4.length; row++){
+            for(let col = 0; col < map4[row].length; col++){
+                const tileIndex = map4[row][col]; // Get number from map1
+                const tileImage = level4Tiles[tileIndex]; // Get the corresponding image from the images[]
+                const screenX = col * tileSize - camera.x;
+                const screenY = row * tileSize - camera.y;
+                
+                if (tileImage) {
+                    draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
+                } else {
+                    console.warn(`Tile image missing for index: ${tileIndex}`);
+                }
+            }   
+        }
+        
+        // Check collisions with tiles
+        for(let row = 0; row < map4.length; row++){
+            for(let col = 0; col < map4[row].length; col++){
+                let tileX = col * tileSize;
+                let tileY = row * tileSize;
+                //  Prevents player from falling through floor while gravity if constantly active
+                if(map4[row][col] == 1){
+                    // Check overlap using HITBOX coordinates
+                    // Standard AABB check: Is the player's HITBOX touching the tile?
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY) {
+                        // Resolve Vertical (Top/Bottom)
+                        if (pOldY + hitBoxHeight <= tileY) { // Landed on Top
+                            player.y = tileY - hitBoxHeight;
+                            velocityY = 0;
+                            onGround = true;
+                        } 
+                        else if (pOldY >= tileY + tileSize) { // Hit Head
+                            player.y = tileY + tileSize;
+                            velocityY = 0;
+                        }
+                        // Resolve Horizontal (Sides)
+                        else if (pOldX + hitBoxWidth <= tileX) { // Left Wall
+                            player.x = tileX - hitBoxWidth;
+                        }
+                        else if (pOldX >= tileX + tileSize) { // Right Wall
+                            player.x = tileX + tileSize;
+                        }
+                    }
+                }
+                if (map4[row][col] == 2) {
+                    // If the bottom of the hitbox is below the top of the pit tile
+                    if (player.y + hitBoxHeight > tileY + 1) {
+                        canMove = false;
+                    } else {
+                        canMove = true;
+                    }
+
+                    // Death trigger: If hitbox is fully inside/below the pit tile
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY + tileSize) {      
+                        screenActive.died = true;
+                        screenActive.level3Active = false;
+                    }
+                }
+                if (map4[row][col] == 3) {
+                    if (player.x < tileX + tileSize && 
+                        player.x + hitBoxWidth > tileX && 
+                        player.y < tileY + tileSize && 
+                        player.y + hitBoxHeight > tileY) {
+                        
+                        onJumpPad = true;
+                        //console.log(onJumpPad);
+                    }
+                    
+                }
+            }
+        }
+        
+        enemies.forEach(npc => {
+            updateNPC(npc, npc.moveState, map4);
+            updateAndDrawEnemy(npc); 
+            if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
+                player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
+                
+                screenActive.died = true;
+                screenActive.level4Active = false;
+            }
+        });
+        
+        draw.drawImage(level4Door, 6016-camera.x, 468-camera.y, 128, 128);
+        animate(4);
+        
+        if(player.x >= worldWidth-176){
+            console.log("Beat level 4");
+            draw.fillStyle = "black";
+            draw.fillRect(0, 0, canvas.width, canvas.height);
+
+            draw.fillStyle = "green";
+            draw.font = ("50px Arial");
+            draw.fillText("You beat level 4!", 215, 300);
+
+            screenActive.level4Active = false;
+            setTimeout(changeLevel, 3000, 4);
+        }
+      
     }
-    //drawGrid();
+    else if(screenActive.level5Active){
+        draw.clearRect(0, 0, canvas.width, canvas.height);
+        if (!levelLoaded) {
+            console.log("did i spawn enemies?");
+            spawnEnemies(map5); 
+            levelLoaded = true;
+        }
+        onGround = false;
+
+        let pOldX = player.x;
+        let pOldY = player.y;
+        velocityY += gravity;
+        player.y += velocityY;
+        hitboxY = player.y + offsetY;
+
+        const worldWidth = map5[0].length * tileSize; // 6144
+        if (keys.right && player.x + hitBoxWidth < worldWidth && canMove) {        
+            player.x += player.speed;
+        } else if (keys.left && player.x > 0 && canMove) {
+            player.x -= player.speed;
+        }
+        hitboxX = player.x + offsetX; 
+ 
+        draw.drawImage(level5Background, 0, 0, 832, 640);
+        for(let row = 0; row < map5.length; row++){
+            for(let col = 0; col < map5[row].length; col++){
+                const tileIndex = map5[row][col]; // Get number from map1
+                const tileImage = level5Tiles[tileIndex]; // Get the corresponding image from the images[]
+                const screenX = col * tileSize - camera.x;
+                const screenY = row * tileSize - camera.y;
+                
+                if (tileImage) {
+                    draw.drawImage(tileImage, screenX, screenY, tileSize, tileSize);
+                } else {
+                    console.warn(`Tile image missing for index: ${tileIndex}`);
+                }
+            }   
+        }
+        
+        // Check collisions with tiles
+        for(let row = 0; row < map5.length; row++){
+            for(let col = 0; col < map5[row].length; col++){
+                let tileX = col * tileSize;
+                let tileY = row * tileSize;
+                //  Prevents player from falling through floor while gravity if constantly active
+                if(map5[row][col] == 1){
+                    // Check overlap using HITBOX coordinates
+                    // Standard AABB check: Is the player's HITBOX touching the tile?
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY) {
+                        // Resolve Vertical (Top/Bottom)
+                        if (pOldY + hitBoxHeight <= tileY) { // Landed on Top
+                            player.y = tileY - hitBoxHeight;
+                            velocityY = 0;
+                            onGround = true;
+                        } 
+                        else if (pOldY >= tileY + tileSize) { // Hit Head
+                            player.y = tileY + tileSize;
+                            velocityY = 0;
+                        }
+                        // Resolve Horizontal (Sides)
+                        else if (pOldX + hitBoxWidth <= tileX) { // Left Wall
+                            player.x = tileX - hitBoxWidth;
+                        }
+                        else if (pOldX >= tileX + tileSize) { // Right Wall
+                            player.x = tileX + tileSize;
+                        }
+                    }
+                }
+                if (map5[row][col] == 2) {
+                    // If the bottom of the hitbox is below the top of the pit tile
+                    if (player.y + hitBoxHeight > tileY + 1) {
+                        canMove = false;
+                    } else {
+                        canMove = true;
+                    }
+
+                    // Death trigger: If hitbox is fully inside/below the pit tile
+                    if (player.x < tileX + tileSize && player.x + hitBoxWidth > tileX && player.y < tileY + tileSize && player.y + hitBoxHeight > tileY + tileSize) {      
+                        screenActive.died = true;
+                        screenActive.level3Active = false;
+                    }
+                }
+                if (map5[row][col] == 3) {
+                    if (player.x < tileX + tileSize && 
+                        player.x + hitBoxWidth > tileX && 
+                        player.y < tileY + tileSize && 
+                        player.y + hitBoxHeight > tileY) {
+                        
+                        onJumpPad = true;
+                        //console.log(onJumpPad);
+                    }
+                    
+                }
+            }
+        }
+        
+        enemies.forEach(npc => {
+            updateNPC(npc, npc.moveState, map5);
+            updateAndDrawEnemy(npc); 
+            if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
+                player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
+                
+                screenActive.died = true;
+                screenActive.level5Active = false;
+            }
+        });
+        
+        draw.drawImage(level5Door, 6016-camera.x, 468-camera.y, 128, 128);
+        animate(5);
+        
+        if(player.x >= worldWidth-176){
+            console.log("Beat level 5");
+            draw.fillStyle = "black";
+            draw.fillRect(0, 0, canvas.width, canvas.height);
+
+            draw.fillStyle = "green";
+            draw.font = ("50px Arial");
+            draw.fillText("You beat level 5!", 215, 300);
+
+            screenActive.level5Active = false;
+            setTimeout(changeLevel, 3000, 5);
+        }
+    }
     // Redraw frames
     requestAnimationFrame(gameLoop);
-    
 }
 gameLoop();
