@@ -8,8 +8,9 @@ transparentTile.onload = () => {
 }
 
 // Create image objects
-let ground = new Image(), firePit = new Image(), jumpPad = new Image();
+let ground = new Image(), firePit = new Image(), jumpPad = new Image(), coinImage = new Image();
 ground.src = "images/OtherPeopleCreated/Dirt&Grass/2.png", firePit.src = "images/AICreated/Bing/Tiles/firePit.png", jumpPad.src = "images/AICreated/Bing/Tiles/jumpPad.png";
+coinImage.src = "images/AICreated/Gemini/coin2.png";
 
 // Add the images to the array
 lvl1Tiles.push(transparentTile);
@@ -144,7 +145,7 @@ level5Tiles.push(transparentTile);
 level5Tiles.push(iceGround);
 level5Tiles.push(icePit);
 level5Tiles.push(jumpPad);
-level5Tiles.push(dancingApe);
+level5Tiles.push(coinImage);
 
 let iceLoaded = 0;
 for (let i = 0; i < level5Tiles.length; i++) {

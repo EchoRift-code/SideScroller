@@ -346,7 +346,14 @@ canvas.addEventListener("click", (e) =>{
                 level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
                 level1Music.currentTime = 0; // Resets the music to the beginning
                 level2Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level2Music.currentTime = 0; // Resets the music to the beginning
+                level3Music.pause(); // Pause it so it doesnt keep playing on the menu screen
                 level3Music.currentTime = 0; // Resets the music to the beginning
+                level4Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level4Music.currentTime = 0; // Resets the music to the beginning
+                level5Music.pause(); // Pause it so it doesnt keep playing on the menu screen
+                level5Music.currentTime = 0; // Resets the music to the beginning
+
                 resets++;
                 console.log("resets:", resets);
                 screenActive.died = false;
@@ -464,6 +471,8 @@ function changeLevel(previousLevel){
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
     map3 = level3.map(row => [...row]);
+    map4 = level3.map(row => [...row]);
+    map5 = level3.map(row => [...row]);
 
     enemies = []; // Clears the array so it can be empty for next level
     levelLoaded = false;
@@ -490,8 +499,9 @@ function changeLevel(previousLevel){
         screenActive.level4Active = false;
         screenActive.level5Active = true;
     }else if(previousLevel == 5){
+        level5Music.pause();
         screenActive.level5Active = false;
-        //screenActive.level2Active = false;
+        beatTheGame();
     }
 }
 
@@ -1031,6 +1041,8 @@ function resetLevels(){
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
     map3 = level3.map(row => [...row]);
+    map4 = level2.map(row => [...row]);
+    map5 = level3.map(row => [...row]);
 
     // Clear the existing enemies so they dont double up
     enemies = [];
@@ -1817,6 +1829,7 @@ function gameLoop(timestamp){
         });
         
         draw.drawImage(level5Door, 6016-camera.x, 468-camera.y, 128, 128);
+       
         animate(5);
         
         if(player.x >= worldWidth-176){
