@@ -2,15 +2,15 @@ export {lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level
 let lvl1Tiles = [];
 
 let transparentTile = new Image();
-transparentTile.src = "images/myImages/transparentTile.png";
+transparentTile.src = "images/MyDrawings/transparentTile.png";
 transparentTile.onload = () => {
     console.log("Transparent tile is ready");
 }
 
 // Create image objects
 let ground = new Image(), firePit = new Image(), jumpPad = new Image(), coinImage = new Image();
-ground.src = "images/OtherPeopleCreated/Dirt&Grass/2.png", firePit.src = "images/AICreated/Bing/Tiles/firePit.png", jumpPad.src = "images/AICreated/Bing/Tiles/jumpPad.png";
-coinImage.src = "images/AICreated/Gemini/coin2.png";
+ground.src = "images/OtherPeopleCreated/Dirt&Grass/2.png", firePit.src = "images/Bing/Tiles/firePit.png";
+jumpPad.src = "images/Bing/Tiles/jumpPad.png", coinImage.src = "images/Gemini/coin2.png";
 
 // Add the images to the array
 lvl1Tiles.push(transparentTile);
@@ -51,17 +51,17 @@ level3Tiles.push(transparentTile); // 0
 let blackCarImg = new Image(), blueCarImg = new Image(), greenCarImg = new Image(), orangeCarImg = new Image();
 let purpleCarImg = new Image(), redCarImg = new Image(), silverCarImg = new Image(), whiteCarImg = new Image();
 
-blackCarImg.src = "images/AICreated/Bing/Tiles/blackCarT.png";
-blueCarImg.src = "images/AICreated/Bing/Tiles/blueCarT.png";
-greenCarImg.src = "images/AICreated/Bing/Tiles/greenCarT.png";
-orangeCarImg.src = "images/AICreated/Bing/Tiles/orangeCarT.png";
-purpleCarImg.src = "images/AICreated/Bing/Tiles/purpleCarT.png";
-redCarImg.src = "images/AICreated/Bing/Tiles/redCarT.png";
-silverCarImg.src = "images/AICreated/Bing/Tiles/silverCarT.png";
-whiteCarImg.src = "images/AICreated/Bing/Tiles/whiteCarT.png";
+blackCarImg.src = "images/Bing/Tiles/blackCarT.png";
+blueCarImg.src = "images/Bing/Tiles/blueCarT.png";
+greenCarImg.src = "images/Bing/Tiles/greenCarT.png";
+orangeCarImg.src = "images/Bing/Tiles/orangeCarT.png";
+purpleCarImg.src = "images/Bing/Tiles/purpleCarT.png";
+redCarImg.src = "images/Bing/Tiles/redCarT.png";
+silverCarImg.src = "images/Bing/Tiles/silverCarT.png";
+whiteCarImg.src = "images/Bing/Tiles/whiteCarT.png";
 
 let sawBladeT = new Image();
-sawBladeT.src = "images/AICreated/Bing/Tiles/sawBladesT.png";
+sawBladeT.src = "images/Bing/Tiles/sawBladesT.png";
 sawBladeT.onload = () =>{
     console.log("Sawblades are loaded");
 }
@@ -104,13 +104,13 @@ for (let i = 0; i < level3Tiles.length; i++) {
 }
 
 let dancingApe = new Image();
-dancingApe.src = "images/AICreated/Bing/dancingApe.png";
+dancingApe.src = "images/Bing/dancingApe.png";
 dancingApe.onload = () => {
     console.log("Ready for the ape");
 }
 
 let level3Background = new Image();
-level3Background.src = "images/AICreated/Bing/Backgrounds/futuristicBackground.png";
+level3Background.src = "images/Bing/Backgrounds/futuristicBackground.png";
 level3Background.onload = () => {
     console.log("Level 3 background is ready");
 }
