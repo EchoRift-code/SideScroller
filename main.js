@@ -1025,6 +1025,15 @@ function updateAndDrawEnemy(npc) {
 }
 
 function resetLevels(){
+    // 1. Tell GoatCounter to count a restart event
+    if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({
+            path:  'game-restart', // The name that shows up in your dashboard
+            title: 'Player Restarted Game',
+            event: true, // This tells them it's a "click/event" not a "page view"
+        });
+    }
+    
     // reset player location 
     player.x = 64;
     player.y = 512;
@@ -1062,14 +1071,7 @@ function dancingApeSprite(){
     draw.drawImage( dancingApe, frameX * apeWidth, frameY * apeHeight, apeWidth, apeHeight, 2976 - camera.x, 466 - camera.y, tileSize*2, tileSize*2 );
 }
 
-function gameLoop(timestamp){  
-    frameCounter++;
-    if (document.hidden) {
-        requestAnimationFrame(gameLoop);
-        return; // Stop the rest of the code from running
-    }
-    
-    updateCamera(); 
+function playerMovement(level){
     // Player movement
     if(canMove){
         if(keys.jump && onGround && !jumped){ 
@@ -1089,6 +1091,28 @@ function gameLoop(timestamp){
         state = keys.left || keys.right ? "walk" : "idle";
     }
 
+    // Calculate the total width of the game world (not the screen)
+    // So: total world width = number of tiles * tile size
+    const worldWidth = level[0].length * tileSize; // 6144
+    //console.log(worldWidth);
+
+    // 3. Move Horizontally
+    if (keys.right && player.x + player.width < worldWidth && canMove) {        
+        player.x += player.speed;
+    } else if (keys.left && player.x + offsetX >= 0 && canMove) {
+        player.x -= player.speed;
+    }
+}
+
+function gameLoop(timestamp){  
+    frameCounter++;
+    if (document.hidden) {
+        requestAnimationFrame(gameLoop);
+        return; // Stop the rest of the code from running
+    }
+    
+    updateCamera(); 
+    
     if(screenActive.mainMenu){
         //console.log("We in the menu");
         
@@ -1168,6 +1192,7 @@ function gameLoop(timestamp){
             spawnEnemies(map1); 
             levelLoaded = true; // This prevents it from running again next frame
         }
+        playerMovement(map1);
         // 1. Reset Ground State (Crucial: Assume in air until proven otherwise)
         onGround = false;
 
@@ -1181,19 +1206,6 @@ function gameLoop(timestamp){
         
         // Update Hitbox Y after moving Y
         hitboxY = player.y + offsetY;
-        
-        // Calculate the total width of the game world (not the screen)
-        // So: total world width = number of tiles * tile size
-        const worldWidth = map1[0].length * tileSize; // 6144
-        //console.log(worldWidth);
-
-        // 3. Move Horizontally
-        if (keys.right && player.x + player.width < worldWidth && canMove) {        
-            player.x += player.speed;
-        } else if (keys.left && player.x + offsetX >= 0 && canMove) {
-            player.x -= player.speed;
-        }
-
         // Update Hitbox X after moving X
         hitboxX = player.x + offsetX;
         
@@ -1318,6 +1330,7 @@ function gameLoop(timestamp){
             spawnEnemies(map2); 
             levelLoaded = true; 
         }
+        playerMovement(map2);
         onGround = false;
         let pOldX = player.x;
         let pOldY = player.y;
