@@ -1031,6 +1031,7 @@ function resetLevels(){
             path:  'game-restart', // The name that shows up in your dashboard
             title: 'Player Restarted Game',
             event: true, // This tells them it's a "click/event" not a "page view"
+            no_session: true
         });
     }
     
