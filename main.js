@@ -1453,6 +1453,7 @@ function gameLoop(timestamp){
             spawnEnemies(map3); 
             levelLoaded = true;
         }
+        playerMovement(map3);
         onGround = false;
 
         let pOldX = player.x;
@@ -1618,6 +1619,7 @@ function gameLoop(timestamp){
             spawnEnemies(map4); 
             levelLoaded = true;
         }
+        playerMovement(map4);
         onGround = false;
 
         let pOldX = player.x;
@@ -1742,6 +1744,7 @@ function gameLoop(timestamp){
             spawnEnemies(map5); 
             levelLoaded = true;
         }
+        playerMovement(map5);
         onGround = false;
 
         let pOldX = player.x;
