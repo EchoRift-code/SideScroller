@@ -1,4 +1,4 @@
-export {lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level5Tiles};
+export {lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level5Tiles, dancingLizard};
 let lvl1Tiles = [];
 
 let transparentTile = new Image();
@@ -7,10 +7,16 @@ transparentTile.onload = () => {
     console.log("Transparent tile is ready");
 }
 
+let dancingLizard = new Image();
+dancingLizard.src = "images/Gemini/dancingLizard.png";
+dancingLizard.onload = () => {
+    console.log("Dancing lizard is ready");
+}
+
 // Create image objects
 let ground = new Image(), firePit = new Image(), jumpPad = new Image(), coinImage = new Image();
 ground.src = "images/OtherPeopleCreated/Dirt&Grass/2.png", firePit.src = "images/Bing/Tiles/firePit.png";
-jumpPad.src = "images/Bing/Tiles/jumpPad.png", coinImage.src = "images/Gemini/coin2.png";
+jumpPad.src = "images/Bing/Tiles/jumpPad.png", coinImage.src = "images/Gemini/coin.png";
 
 // Add the images to the array
 lvl1Tiles.push(transparentTile);

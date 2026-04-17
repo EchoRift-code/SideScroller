@@ -6,7 +6,8 @@ import { level5 } from "./levels/level5.js";
 
 import { menuBackground, settingsBackground, level1Door, level1Background, level2Door,
         level3Door, level4Background, level4Door, level5Background, level5Door } from "./loadImages/others.js";
-import { lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level5Tiles } from "./loadImages/loadTiles.js";
+
+import { lvl1Tiles, level3Tiles, dancingApe, level3Background, level4Tiles, level5Tiles, dancingLizard } from "./loadImages/loadTiles.js";
 
 import { crabImage, mushroomImage, bearImage, robotImage} from "./loadImages/loadEnemies.js";
 
@@ -77,26 +78,50 @@ const tileSize = 64;
 let canMove = true, onJumpPad = false, onGround = false;
 
 // what screen is active for the buttons to be usable
-let startMenuActive = true, diedScreenActive = false, settingActive = false;
+let startMenuActive = true, diedScreenActive = false, settingActive = false, wonScreenActive = false;
 
 // Buttons
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
 let backButton = {x: canvas.width/2 - 75, y: 400, width: 150, height: 50};
 
-let volumeRect = {x: canvas.width/2 - 75, y: 140, width: 150, height: 50};
-let volumeBarOutline = {x: canvas.width/2 - 50, y: 200, width: 100, height: 50};
-let volumeBar = {x: canvas.width/2 - 50, y: 200, width: 50, height: 50};
-let volumeDown = {x: canvas.width/2 - 45, y: 255, width: 40, height: 40};
-let volumeUp = {x: canvas.width/2 + 5, y: 255, width: 40, height: 40};
-let muteButton = {x: canvas.width/2 - 75, y: 300, width: 150, height: 50};
+let volumeRect = {x: canvas.width/2 - 75, y: 95, width: 150, height: 50};
+let volumeBarOutline = {x: canvas.width/2 - 50, y: 150, width: 100, height: 50};
+let volumeBar = {x: canvas.width/2 - 50, y: 150, width: 50, height: 50};
+let volumeDown = {x: canvas.width/2 - 45, y: 205, width: 40, height: 40};
+let volumeUp = {x: canvas.width/2 + 5, y: 205, width: 40, height: 40};
+let muteButton = {x: canvas.width/2 - 75, y: 250, width: 150, height: 50};
 
 let restartButton = { x: 205, y: 275, width: 170, height: 50};
 let mainMenuButton = { x: 425, y: 275, width: 170, height: 50};
+let wonButton = { x: 370, y: 275, width: 120, height: 50 };
+
+// Left, right, up, down
+let circle1 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle2 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle3 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle4 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+
+// Vertical
+let circle5 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle6 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle7 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle8 = { x: 100, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+
+// Second firework
+let circle9 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle10 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle11 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle12 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+
+let circle13 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle14 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle15 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
+let circle16 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2 };
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, 
+let screenActive = {mainMenu: true, settings: false, died: false, won: false,
                 level1Active: false, level2Active: false, level3Active: false, level4Active: false, level5Active: false};
 let player = { x: 64, y: 512, width: 96, height: 84, speed: 3};
 let hitboxX = 0, hitboxY = 0;
@@ -287,6 +312,7 @@ canvas.addEventListener("click", (e) =>{
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left; // X relative to canvas
         const mouseY = e.clientY - rect.top; // Y relative to canvas
+        //console.log("Mouse X:", mouseX, "Mouse Y:", mouseY);
         //console.log("X:", player.x, "Y:", player.y);
         if(startMenuActive){
             if(mouseX >= startButton.x && mouseX <= startButton.x + startButton.width && mouseY >= startButton.y && mouseY <= startButton.y + startButton.height){
@@ -295,13 +321,16 @@ canvas.addEventListener("click", (e) =>{
                 player.y = 512;
                 screenActive.mainMenu = false;
                 screenActive.level1Active = true;
-                startMenuActive = false;     
+                startMenuActive = false;   
+                //console.log("Clicked start");  
             }
             if(mouseX >= settingButton.x && mouseX <= settingButton.x + settingButton.width && mouseY >= settingButton.y && mouseY <= settingButton.y + settingButton.height){
                 screenActive.mainMenu = false;
                 screenActive.settings = true;
-                settingActive = true;
+                
                 startMenuActive = false;
+                settingActive = true;
+                //console.log("Clicked setting"); 
             }
         }
         if(settingActive){   
@@ -369,6 +398,17 @@ canvas.addEventListener("click", (e) =>{
                 screenActive.died = false;
                 diedScreenActive = false;
                                     
+            }
+        }
+        if(wonScreenActive){
+            
+            if(mouseX >= wonButton.x && mouseX <= wonButton.x + wonButton.width && mouseY >= wonButton.y && mouseY <= wonButton.y + wonButton.height){                
+                //console.log("clicked");
+                //console.log(wonButton.x);
+                screenActive.mainMenu = true;
+                startMenuActive = true;
+                screenActive.won = false;
+                wonScreenActive = false;
             }
         }
     }else if(editorMode){
@@ -471,8 +511,8 @@ function changeLevel(previousLevel){
     map1 = level1.map(row => [...row]);
     map2 = level2.map(row => [...row]);
     map3 = level3.map(row => [...row]);
-    map4 = level3.map(row => [...row]);
-    map5 = level3.map(row => [...row]);
+    map4 = level4.map(row => [...row]);
+    map5 = level5.map(row => [...row]);
 
     enemies = []; // Clears the array so it can be empty for next level
     levelLoaded = false;
@@ -501,7 +541,8 @@ function changeLevel(previousLevel){
     }else if(previousLevel == 5){
         level5Music.pause();
         screenActive.level5Active = false;
-        beatTheGame();
+        screenActive.won = true;
+        wonScreenActive = true;
     }
 }
 
@@ -690,7 +731,7 @@ function animate(level){
             switch(state){
                 case "idle":
                     const dogIdleTotalFrames = 2;
-                    const sxidle = idleFrame * dogWidth;
+                    const sdogxidle = idleFrame * dogWidth;
                     idleTimer++;
 
                     if (idleTimer >= dogSpeed) {
@@ -700,7 +741,7 @@ function animate(level){
                     
                     if (goingRight) {
                         // Draw normally at drawX, drawY
-                        draw.drawImage(playerLvl2, sxidle, 128, dogWidth, dogHeight, drawX, drawY, dogWidthInc, dogHeightInc);
+                        draw.drawImage(playerLvl2, sdogxidle, 128, dogWidth, dogHeight, drawX, drawY, dogWidthInc, dogHeightInc);
                     } else {
                         draw.save();
                         // Move to the right edge of the sprite's destination
@@ -710,7 +751,7 @@ function animate(level){
                         // The Scale: draw.scale(-1, 1) flips the world horizontally from that point
                         draw.scale(-1, 1);
                         // Draw at 0, 0 because the "paper" was moved to drawX, drawY
-                        draw.drawImage(playerLvl2, sxidle, 128, dogWidth, dogHeight, 
+                        draw.drawImage(playerLvl2, sdogxidle, 128, dogWidth, dogHeight, 
                                         0, 0, dogWidthInc, dogHeightInc);
                         draw.restore();
                     }
@@ -1072,7 +1113,82 @@ function dancingApeSprite(){
     draw.drawImage( dancingApe, frameX * apeWidth, frameY * apeHeight, apeWidth, apeHeight, 2976 - camera.x, 466 - camera.y, tileSize*2, tileSize*2 );
 }
 
-function playerMovement(level){
+let lizardFrameSpeed = 30;
+let lizardTotalFrames = 4;
+function dancingLizardSprite(){
+    let currentFrame = Math.floor(frameCounter / lizardFrameSpeed) % lizardTotalFrames;
+    let frameX = currentFrame % 4; // 0,1,2,3
+    let frameY = Math.floor(currentFrame / 4); // changes every 4 frames
+
+    const lizardWidth = 303, lizardHeight = 263;
+
+    // 3. Draw to screen 
+    draw.drawImage( dancingLizard, frameX * lizardWidth, frameY * lizardHeight, lizardWidth, lizardHeight, 2528 - camera.x, 64 - camera.y, tileSize*2, tileSize*2 );
+    draw.drawImage( dancingLizard, frameX * lizardWidth, frameY * lizardHeight, lizardWidth, lizardHeight, 4080 - camera.x, 128 - camera.y, tileSize*2, tileSize*2 );
+}
+
+/** adding this above the function makes it like 'the owners manual' so when you start writing the function itll show you the parameters it wants in more detail
+ * Draws a spike ball (urchin) on the canvas.
+ * @param {CanvasRenderingContext2D} draw - The canvas context.
+ * @param {number} centerX - The X position of the ball's center.
+ * @param {number} centerY - The Y position of the ball's center.
+ * @param {number} innerRadius - The radius of the solid ball.
+ * @param {number} spikeLength - How far the spikes stick out.
+ * @param {number} numSpikes - How many spikes to draw.
+ * @param {string} color - The color of the spike ball.
+ */
+
+function drawSpikeBall(draw, centerX, centerY, innerRadius, spikeLength, numSpikes, color) {
+    draw.beginPath();
+    draw.fillStyle = color;
+    draw.strokeStyle = color; // Outline is the same color for a solid look
+    draw.lineWidth = 2;
+
+    for (let i = 0; i < numSpikes; i++) {
+        // 1. Calculate the angle for this spike (in radians)
+        // (i / numSpikes) gives us the fraction of the full circle (0 to 1).
+        // Multiplying by Math.PI * 2 gives us the angle (0 to 2π).
+        const angle = (i / numSpikes) * Math.PI * 2;
+
+        // 2. Calculate the BASE position (where the spike touches the ball)
+        // The base should be slightly offset so the spike has a 'width'.
+        // We calculate the point on the circle at this angle.
+        const baseY = centerY + innerRadius * Math.sin(angle);
+        const baseX = centerX + innerRadius * Math.cos(angle);
+
+        // 3. Calculate the TIP position (the outer point)
+        // We use the same angle but add the spike length to the radius.
+        const tipRadius = innerRadius + spikeLength;
+        const tipY = centerY + tipRadius * Math.sin(angle);
+        const tipX = centerX + tipRadius * Math.cos(angle);
+
+        // 4. Draw the triangle (spike)
+        // We go from the base, to the tip, and back to the base,
+        // but offset the base slightly for the next triangle to create a gap.
+        
+        // This is a simplified spike: a single line from center to tip
+        // If you want a full 'triangle' spike, it gets a bit more complex.
+        
+        draw.moveTo(baseX, baseY); // Start at the ball surface
+        draw.lineTo(tipX, tipY);   // Draw out to the tip
+    }
+
+    draw.stroke(); // Draw the spiked outline
+    
+    // 5. Draw the solid center ball to cover the spike bases
+    draw.beginPath();
+    draw.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    draw.fill(); // Fill the center ball
+    draw.closePath();
+}
+
+function gameLoop(timestamp){  
+    frameCounter++;
+    
+    if (document.hidden) {
+        requestAnimationFrame(gameLoop);
+        return; // Stop the rest of the code from running
+    }
     // Player movement
     if(canMove){
         if(keys.jump && onGround && !jumped){ 
@@ -1091,44 +1207,13 @@ function playerMovement(level){
     if (onGround && state === "jump") {
         state = keys.left || keys.right ? "walk" : "idle";
     }
-
-    // Calculate the total width of the game world (not the screen)
-    // So: total world width = number of tiles * tile size
-    const worldWidth = level[0].length * tileSize; // 6144
-    //console.log(worldWidth);
-
-    // 3. Move Horizontally
-    if (keys.right && player.x + player.width < worldWidth && canMove) {        
-        player.x += player.speed;
-    } else if (keys.left && player.x + offsetX >= 0 && canMove) {
-        player.x -= player.speed;
-    }
-}
-
-function gameLoop(timestamp){  
-    frameCounter++;
-    if (document.hidden) {
-        requestAnimationFrame(gameLoop);
-        return; // Stop the rest of the code from running
-    }
-    
     updateCamera(); 
-    
+
     if(screenActive.mainMenu){
-        //console.log("We in the menu");
-        
         startMenuActive = true; // Makes sure the buttons are only clickable if in this screen
-        // Background color
-        //draw.fillStyle = "black";
-        //draw.fillRect(0,0,canvas.width, canvas.height);    
         
         draw.drawImage(menuBackground, 0, 0);
-    
-        // Draw the rectangles for the button
-        //draw.fillStyle = "red";
-        //draw.fillRect(startButton.x, startButton.y, startButton.width, startButton.height);
-        //draw.fillRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
-
+        draw.strokeStyle = "black";
         draw.strokeRect(startButton.x, startButton.y, startButton.width, startButton.height);
         draw.strokeRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
         
@@ -1162,7 +1247,6 @@ function gameLoop(timestamp){
         draw.fillText("+", volumeUp.x + 5, volumeUp.y + 37);
         
     }
-    
     else if(screenActive.died){
         diedScreenActive = true;
         velocityY = 0;
@@ -1193,7 +1277,7 @@ function gameLoop(timestamp){
             spawnEnemies(map1); 
             levelLoaded = true; // This prevents it from running again next frame
         }
-        playerMovement(map1);
+        
         // 1. Reset Ground State (Crucial: Assume in air until proven otherwise)
         onGround = false;
 
@@ -1207,6 +1291,17 @@ function gameLoop(timestamp){
         
         // Update Hitbox Y after moving Y
         hitboxY = player.y + offsetY;
+        // Calculate the total width of the game world (not the screen)
+        // So: total world width = number of tiles * tile size
+        const worldWidth = map1[0].length * tileSize; // 6144
+        //console.log(worldWidth);
+
+        // 3. Move Horizontally
+        if (keys.right && player.x + player.width < worldWidth && canMove) {        
+            player.x += player.speed;
+        } else if (keys.left && player.x + offsetX >= 0 && canMove) {
+            player.x -= player.speed;
+        }
         // Update Hitbox X after moving X
         hitboxX = player.x + offsetX;
         
@@ -1311,7 +1406,7 @@ function gameLoop(timestamp){
         draw.drawImage(level1Door, 6016-camera.x, 478-camera.y, 128, 128);
         animate(1);
         
-        if(player.x == 6049){
+        if(player.x == worldWidth-128){
             console.log("Beat level 1");
             draw.fillStyle = "black";
             draw.fillRect(0, 0, canvas.width, canvas.height);
@@ -1331,7 +1426,7 @@ function gameLoop(timestamp){
             spawnEnemies(map2); 
             levelLoaded = true; 
         }
-        playerMovement(map2);
+        
         onGround = false;
         let pOldX = player.x;
         let pOldY = player.y;
@@ -1453,7 +1548,6 @@ function gameLoop(timestamp){
             spawnEnemies(map3); 
             levelLoaded = true;
         }
-        playerMovement(map3);
         onGround = false;
 
         let pOldX = player.x;
@@ -1619,7 +1713,6 @@ function gameLoop(timestamp){
             spawnEnemies(map4); 
             levelLoaded = true;
         }
-        playerMovement(map4);
         onGround = false;
 
         let pOldX = player.x;
@@ -1735,7 +1828,6 @@ function gameLoop(timestamp){
             screenActive.level4Active = false;
             setTimeout(changeLevel, 3000, 4);
         }
-      
     }
     else if(screenActive.level5Active){
         draw.clearRect(0, 0, canvas.width, canvas.height);
@@ -1744,7 +1836,6 @@ function gameLoop(timestamp){
             spawnEnemies(map5); 
             levelLoaded = true;
         }
-        playerMovement(map5);
         onGround = false;
 
         let pOldX = player.x;
@@ -1846,7 +1937,7 @@ function gameLoop(timestamp){
         });
         
         draw.drawImage(level5Door, 6016-camera.x, 468-camera.y, 128, 128);
-       
+       dancingLizardSprite();
         animate(5);
         
         if(player.x >= worldWidth-176){
@@ -1861,6 +1952,133 @@ function gameLoop(timestamp){
             screenActive.level5Active = false;
             setTimeout(changeLevel, 3000, 5);
         }
+    }
+    else if(screenActive.won){
+        let fireWorkSpeedX = .3;
+        let fireWorkSpeedY = .3;
+
+        draw.fillStyle = "black";
+        draw.fillRect( 0, 0, canvas.width, canvas.height);
+        draw.fillStyle = "darkgreen";
+        draw.font = ("50px Arial");
+        draw.fillText("You won!", canvas.width/2-100, canvas.height/2-175);
+        // To put a variable in the text it, the text needs to be surrounded by `` and have ${}
+        draw.fillText(`You reset the game: ${resets}`, canvas.width/2-250, canvas.height/2-125); 
+        
+        if(resets >= 0 && resets <= 5){
+            draw.fillText("Not bad at all", canvas.width/2-150, canvas.height/2-75);
+        }if(resets >= 6 && resets <= 10){
+            draw.fillText("Thats kinda bad", canvas.width/2-100, canvas.height/2-75);
+        }if(resets >= 11 && resets <= 15){
+            draw.fillText("You may need to practice your skills more", canvas.width/2-150, canvas.height/2-75);
+        }if(resets >= 16 && resets <= 20){
+            draw.fillText("Thats pretty sad. I dont think games are for you.", canvas.width/2-250, canvas.height/2-75);
+        }
+
+        // Center (x, y), Ball radius, Spike length (total radius is 20 + 15 = 35), 12 spikes (like a clock), Color
+        drawSpikeBall( draw, circle1.x, circle1.y, circle1.radius, 5, 12, "cyan" );
+        drawSpikeBall( draw, circle2.x, circle2.y, circle2.radius, 5, 12, "purple" );
+        drawSpikeBall( draw, circle3.x, circle3.y, circle3.radius, 5, 12, "red" );
+        drawSpikeBall( draw, circle4.x, circle4.y, circle4.radius, 5, 12, "green" );
+
+        drawSpikeBall( draw, circle5.x, circle5.y, circle5.radius, 5, 12, "yellow" );
+        drawSpikeBall( draw, circle6.x, circle6.y, circle6.radius, 5, 12, "pink" );
+        drawSpikeBall( draw, circle7.x, circle7.y, circle7.radius, 5, 12, "orange" );
+        drawSpikeBall( draw, circle8.x, circle8.y, circle8.radius, 5, 12, "azure" );
+
+        drawSpikeBall( draw, circle9.x, circle9.y, circle9.radius, 5, 12, "cyan" );
+        drawSpikeBall( draw, circle10.x, circle10.y, circle10.radius, 5, 12, "purple" );
+        drawSpikeBall( draw, circle11.x, circle11.y, circle11.radius, 5, 12, "red" );
+        drawSpikeBall( draw, circle12.x, circle12.y, circle12.radius, 5, 12, "green" );
+
+        drawSpikeBall( draw, circle13.x, circle13.y, circle13.radius, 5, 12, "yellow" );
+        drawSpikeBall( draw, circle14.x, circle14.y, circle14.radius, 5, 12, "pink" );
+        drawSpikeBall( draw, circle15.x, circle15.y, circle15.radius, 5, 12, "orange" );
+        drawSpikeBall( draw, circle16.x, circle16.y, circle16.radius, 5, 12, "azure" );
+        
+        if(circle1.y >= 120){
+            // Reset Y coordinate
+            circle1.y = 100;
+            circle2.y = 100;
+            circle3.y = 100;
+            circle4.y = 100;
+
+            circle5.y = 100;
+            circle6.y = 100;
+            circle7.y = 100;
+            circle8.y = 100;
+
+            circle9.y = 100;
+            circle10.y = 100;
+            circle11.y = 100;
+            circle12.y = 100;
+
+            circle13.y = 100;
+            circle14.y = 100;
+            circle15.y = 100;
+            circle16.y = 100;
+
+            // Reset X coordinate
+            circle1.x = 100;
+            circle2.x = 100;
+            circle3.x = 100;
+            circle4.x = 100;
+            
+            circle5.x = 100;
+            circle6.x = 100;
+            circle7.x = 100;
+            circle8.x = 100;
+
+            circle9.x = 700;
+            circle10.x = 700;
+            //console.log(circle10.y);
+            circle11.x = 700;
+            circle12.x = 700;
+
+            circle13.x = 700;
+            circle14.x = 700;
+            circle15.x = 700;
+            circle16.x = 700;
+        }else{
+            // Move firework 1
+            circle1.y += fireWorkSpeedY;   
+            circle2.x += fireWorkSpeedX;
+            circle3.y -= fireWorkSpeedY;
+            circle4.x -= fireWorkSpeedX;
+
+            circle5.x += fireWorkSpeedX;
+            circle5.y += fireWorkSpeedY;
+            circle6.x -= fireWorkSpeedX;
+            circle6.y -= fireWorkSpeedY;
+
+            circle7.x -= fireWorkSpeedX;
+            circle7.y += fireWorkSpeedY;
+            circle8.x += fireWorkSpeedX;
+            circle8.y -= fireWorkSpeedY;
+
+            // Move firework 2
+            circle9.y += fireWorkSpeedY;   
+            circle10.x += fireWorkSpeedX;
+            circle11.y -= fireWorkSpeedY;
+            circle12.x -= fireWorkSpeedX;
+
+            circle13.x += fireWorkSpeedX;
+            circle13.y += fireWorkSpeedY;
+            circle14.x -= fireWorkSpeedX;
+            circle14.y -= fireWorkSpeedY;
+
+            circle15.x -= fireWorkSpeedX;
+            circle15.y += fireWorkSpeedY;
+            circle16.x += fireWorkSpeedX;
+            circle16.y -= fireWorkSpeedY;
+        }
+        draw.fillStyle = "red";
+        draw.fillRect(wonButton.x, wonButton.y, wonButton.width, wonButton.height);
+        draw.strokeRect(wonButton.x, wonButton.y, wonButton.width, wonButton.height);
+        
+        draw.fillStyle = "white";
+        draw.font = "35px Arial";
+        draw.fillText("MENU", wonButton.x+10, wonButton.y+38);
     }
     // Redraw frames
     requestAnimationFrame(gameLoop);
