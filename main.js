@@ -78,12 +78,14 @@ const tileSize = 64;
 let canMove = true, onJumpPad = false, onGround = false;
 
 // what screen is active for the buttons to be usable
-let startMenuActive = true, diedScreenActive = false, settingActive = false, wonScreenActive = false;
+let startMenuActive = true, diedScreenActive = false, settingActive = false, wonScreenActive = false, creditScreenActive = false;
 
 // Buttons
 let startButton = { x: canvas.width/2-50, y: 200, width: 150, height: 50};
 let settingButton = { x: canvas.width/2-50, y: 300, width: 150, height: 50};
+let creditButton = { x: canvas.width/2-50, y: 400, width: 150, height: 50};
 let backButton = {x: canvas.width/2 - 75, y: 400, width: 150, height: 50};
+let backButton2 = {x: 725, y: 580, width: 100, height: 50};
 
 let volumeRect = {x: canvas.width/2 - 75, y: 95, width: 150, height: 50};
 let volumeBarOutline = {x: canvas.width/2 - 50, y: 150, width: 100, height: 50};
@@ -121,7 +123,7 @@ let circle16 = { x: 700, y: 100, radius: 5, startAngle: 0, endAngle: Math.PI * 2
 
 let camera = { x : 0, y : 0};
 
-let screenActive = {mainMenu: true, settings: false, died: false, won: false,
+let screenActive = {mainMenu: true, settings: false, died: false, won: false, credits: false,
                 level1Active: false, level2Active: false, level3Active: false, level4Active: false, level5Active: false};
 let player = { x: 64, y: 512, width: 96, height: 84, speed: 3};
 let hitboxX = 0, hitboxY = 0;
@@ -332,6 +334,14 @@ canvas.addEventListener("click", (e) =>{
                 settingActive = true;
                 //console.log("Clicked setting"); 
             }
+            if(mouseX >= creditButton.x && mouseX <= creditButton.x + creditButton.width && mouseY >= creditButton.y && mouseY <= creditButton.y + creditButton.height){
+                screenActive.mainMenu = false;
+                screenActive.credits = true;
+                
+                startMenuActive = false;
+                creditScreenActive = true;
+                //console.log("Clicked setting"); 
+            }
         }
         if(settingActive){   
             if(mouseX >= volumeDown.x && mouseX <= volumeDown.x + volumeDown.width && mouseY >= volumeDown.y && mouseY <= volumeDown.y + volumeDown.height){
@@ -370,6 +380,14 @@ canvas.addEventListener("click", (e) =>{
                 settingActive = false;                  
             }
         }
+        if(creditScreenActive){
+            if(mouseX >= backButton2.x && mouseX <= backButton2.x + backButton2.width && mouseY >= backButton2.y && mouseY <= backButton2.y + backButton2.height){                   
+                startMenuActive = true;
+                screenActive.mainMenu = true;
+                screenActive.credits = false;
+                creditScreenActive = false;                  
+            }
+        }
         if(diedScreenActive){
             if(mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width && mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height){
                 level1Music.pause(); // Pause it so it doesnt keep playing on the menu screen
@@ -401,7 +419,6 @@ canvas.addEventListener("click", (e) =>{
             }
         }
         if(wonScreenActive){
-            
             if(mouseX >= wonButton.x && mouseX <= wonButton.x + wonButton.width && mouseY >= wonButton.y && mouseY <= wonButton.y + wonButton.height){                
                 //console.log("clicked");
                 //console.log(wonButton.x);
@@ -1182,6 +1199,9 @@ function drawSpikeBall(draw, centerX, centerY, innerRadius, spikeLength, numSpik
     draw.closePath();
 }
 
+let artworkCreditY = 50;
+let musicCreditY = 350;
+
 function gameLoop(timestamp){  
     frameCounter++;
     
@@ -1216,12 +1236,14 @@ function gameLoop(timestamp){
         draw.strokeStyle = "black";
         draw.strokeRect(startButton.x, startButton.y, startButton.width, startButton.height);
         draw.strokeRect(settingButton.x, settingButton.y, settingButton.width, settingButton.height);
+        draw.strokeRect(creditButton.x, creditButton.y, creditButton.width, creditButton.height);
         
         // Draw the writing inside the buttons
         draw.fillStyle = "white";
         draw.font = "35px Arial";
         draw.fillText("START", startButton.x+20, startButton.y+38);                 
         draw.fillText("SETTING", settingButton.x, settingButton.y+38);  
+        draw.fillText("CREDIT", creditButton.x+10, creditButton.y+38);
     }
     else if(screenActive.settings){
         draw.drawImage(settingsBackground, 0, 0);
@@ -1964,15 +1986,17 @@ function gameLoop(timestamp){
         draw.fillText("You won!", canvas.width/2-100, canvas.height/2-175);
         // To put a variable in the text it, the text needs to be surrounded by `` and have ${}
         draw.fillText(`You reset the game: ${resets}`, canvas.width/2-250, canvas.height/2-125); 
-        
+    
         if(resets >= 0 && resets <= 5){
             draw.fillText("Not bad at all", canvas.width/2-150, canvas.height/2-75);
         }if(resets >= 6 && resets <= 10){
-            draw.fillText("Thats kinda bad", canvas.width/2-100, canvas.height/2-75);
+            draw.fillText("Thats kinda bad", canvas.width/2-165, canvas.height/2-75);
         }if(resets >= 11 && resets <= 15){
-            draw.fillText("You may need to practice your skills more", canvas.width/2-150, canvas.height/2-75);
+            draw.font = ("40px Arial");
+            draw.fillText("You may need to practice your skills more", canvas.width/2-350, canvas.height/2-75);
         }if(resets >= 16 && resets <= 20){
-            draw.fillText("Thats pretty sad. I dont think games are for you.", canvas.width/2-250, canvas.height/2-75);
+            draw.font = ("35px Arial");
+            draw.fillText("Thats pretty sad. I dont think games are for you.", canvas.width/2-375, canvas.height/2-75);
         }
 
         // Center (x, y), Ball radius, Spike length (total radius is 20 + 15 = 35), 12 spikes (like a clock), Color
@@ -2079,6 +2103,36 @@ function gameLoop(timestamp){
         draw.fillStyle = "white";
         draw.font = "35px Arial";
         draw.fillText("MENU", wonButton.x+10, wonButton.y+38);
+    }
+    else if(screenActive.credits){
+        draw.fillStyle = "blue";
+        draw.fillRect( 0, 0, canvas.width, canvas.height );  
+        draw.fillStyle = "green";
+        draw.fillRect( backButton2.x, backButton2.y, backButton2.width, backButton2.height );
+
+        draw.fillStyle = "white";
+        draw.font = "35px Arial";
+        draw.fillText("Back", backButton2.x+10, backButton2.y+35); 
+    
+        draw.fillText("Artwork by: ", canvas.width/2 - 65, artworkCreditY);  
+        draw.font = "25px Arial";
+        draw.fillText("https://www.gameart2d.com/about.html; Zuhria Alfitra ", canvas.width/2 - 255, artworkCreditY+50);
+        draw.fillText("https://artoellie.itch.io/", canvas.width/2 - 95, artworkCreditY+100);  
+        draw.fillText("https://xzany.itch.io/", canvas.width/2 - 85, artworkCreditY+150);  
+        draw.fillText("https://ninjikin.itch.io/", canvas.width/2 - 85, artworkCreditY+200);
+        draw.fillText("Gemini, Bing AI, ChatGPT", canvas.width/2 - 100, artworkCreditY+250);
+       
+
+        draw.font = "35px Arial";
+        draw.fillText("Music by: ", canvas.width/2 - 50, musicCreditY);
+        draw.font = "25px Arial";
+        draw.fillText("https://pixabay.com/users/nastelbom-48128234/", canvas.width/2 - 225, musicCreditY+50);
+        draw.fillText("https://pixabay.com/users/alexgrohl-25289918/", canvas.width/2 - 225, musicCreditY+100);
+        draw.fillText("https://pixabay.com/users/denys_brodovskyi-26932554/", canvas.width/2 - 225, musicCreditY+150);
+        draw.fillText("https://pixabay.com/users/alexgrohl-25289918/", canvas.width/2 - 225, musicCreditY+200);
+        draw.fillText("https://pixabay.com/users/monume-44679891/", canvas.width/2 - 225, musicCreditY+250);
+
+        //artworkCreditY-=.5;  
     }
     // Redraw frames
     requestAnimationFrame(gameLoop);
