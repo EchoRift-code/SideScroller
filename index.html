@@ -49,24 +49,22 @@
                 pointer-events: none; /* Allows clicks to "pass through" the empty space to the canvas */
             }
 
-            /* This will only change the size of the buttons in this container*/
-            .controls button{
-                width: 20vh;    /* 20% of the screen height */
-                height: 15vh;   /* 15% of the screen height */
-                font-size: 10vh; /* Font scales with button */
+            /* Update buttons to use viewport width (vw) for better mobile scaling */
+            .controls button {
+                /* Use clamp() to set a range: min size, preferred size, max size */
+                width: clamp(60px, 20vw, 100px); 
+                height: clamp(50px, 15vw, 80px);
+                font-size: clamp(20px, 8vw, 40px);
                 
                 border-radius: 10px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                
-                opacity: 0.6;   /* Make them semi-transparent so you can see the game through them */
+                opacity: 0.6;
                 touch-action: none;
-                /*Prevents the phone from scrolling while user is playing*/
                 user-select: none;
-                /*Prevents the copy/paste menu from popping up on long press*/
                 -webkit-user-select: none;
-                pointer-events: auto; /* Re-enables clicking for the buttons themselves */
+                pointer-events: auto;
             }
 
             /* Style all buttons globally */
@@ -87,12 +85,19 @@
                 background-color: #666; /* Changes the background color of the button to light grey*/
             }
             
+            /* Update your canvas to allow it to grow and fill space */
             canvas {
-                max-width: 100%;  /* Ensure it doesn't spill off the sides */
-                max-height: 80vh; /* Leave room for the buttons at the bottom */
+                max-width: 100%;
+                /* Remove max-height: 80vh to let it fill available space */
+                width: 100%;
+                height: auto; 
+                flex-grow: 1; /* Allows the canvas to expand into available space */
                 display: block;
                 border: 2px solid black;
-                object-fit: contain; /* Keeps the aspect ratio perfect */
+                object-fit: contain;
+                image-rendering: pixelated;
+                /* Added to prevent the canvas from overflowing the container */
+                max-height: 100%; 
             }
             </style>
     </head>
