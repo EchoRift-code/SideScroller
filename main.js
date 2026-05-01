@@ -1405,22 +1405,15 @@ function gameLoop(timestamp){
             }
         }
         
-        // --- NEW: DRAW AND UPDATE ALL ENEMIES ---
-        // Instead of calling ogre1, ogre2, etc., we loop through the array
-        enemies.forEach(npc => {
-            // 1. Logic (Turn around at walls/cliffs)
+        
+        enemies.forEach(npc => {     
             updateNPC(npc, npc.moveState, map1);
-
-            // 2. Animation & Drawing
-            // This function now uses npc.image, npc.frameIndex, etc.
             updateAndDrawEnemy(npc); 
 
-            // 3. Collision
             if (player.x < npc.x + 37 && player.x + hitBoxWidth > npc.x + 13 && 
                 player.y < npc.y + tileSize && player.y + hitBoxHeight > npc.y) {
                 
-                screenActive.died = true;
-                screenActive.level1Active = false;
+                
             }
         });
 
