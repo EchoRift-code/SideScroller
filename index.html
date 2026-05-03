@@ -5,6 +5,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+       
         <link rel="icon" href="data:,">
         <title>Side Scroller</title> <!-- Title of the browser page-->
         <!-- Set up to allow GoatCounter to track game-->
@@ -20,7 +21,7 @@
                 font-family: Arial, sans-serif; /* Font style */
 
                 padding: 0;
-                overflow: auto; /* Hides the scrollbar */
+                overflow: hidden; /* Hides the scrollbar */
 
                 display: flex; /* Enables the flexbox layout */
                 flex-direction: column; /* Stacks item vertically*/
@@ -29,6 +30,7 @@
                 align-items: center; /*Center canvas vertically*/
 
                 height: 100vh; /*full viewport height*/
+                touch-action: none;
             }
             h1{/* Styles the text above the canvas*/
                 margin-top: 20px; /* Space from the top of the page*/
@@ -87,17 +89,14 @@
             
             /* Update your canvas to allow it to grow and fill space */
             canvas {
-                max-width: 100%;
-                /* Remove max-height: 80vh to let it fill available space */
-                width: 100%;
+                max-width: 100vw; /* Ensure it never exceeds screen width */
+                max-height: 70vh; /* Leave room for the 'Welcome' text and buttons */
+                width: auto;      /* Allow it to maintain aspect ratio */
                 height: auto; 
-                flex-grow: 1; /* Allows the canvas to expand into available space */
                 display: block;
                 border: 2px solid black;
                 object-fit: contain;
                 image-rendering: pixelated;
-                /* Added to prevent the canvas from overflowing the container */
-                max-height: 100%; 
             }
             </style>
     </head>
